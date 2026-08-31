@@ -3,21 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Hub Personal</title>
+  <title>Mis Enlaces</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --card-hover: #334155;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-hover: #0284c7;
+      --bg-base: #09090b;
+      --bg-surface: #18181b;
+      --bg-hover: #27272a;
+      --border: #3f3f46;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
       --danger: #ef4444;
-      --success: #22c55e;
-      --border: #334155;
       --radius: 12px;
-      --transition: 0.3s ease;
+      --transition: 0.2s ease;
     }
 
     * {
@@ -28,573 +27,428 @@
     }
 
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-base);
       color: var(--text-main);
-      padding: 24px;
+      padding: 0 20px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* Cabecera con Ícono de Configuración */
+    /* Cabecera y Buscador */
     header {
+      width: 100%;
+      max-width: 1000px;
+      padding: 40px 0 30px 0;
+      position: sticky;
+      top: 0;
+      background: var(--bg-base);
+      z-index: 10;
+      border-bottom: 1px solid transparent;
+      transition: border-bottom var(--transition);
+    }
+
+    header.scrolled {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
-      max-width: 800px;
-      margin-bottom: 30px;
-      padding: 0 10px;
+      margin-bottom: 24px;
     }
 
-    header h1 {
+    h1 {
       font-size: 1.8rem;
-      color: var(--accent);
+      font-weight: 700;
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .btn-icon {
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background var(--transition);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Buscador */
+    .search-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-container input {
+      width: 100%;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 14px 20px 14px 44px;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .search-container input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    /* Grid de Enlaces */
+    main {
+      width: 100%;
+      max-width: 1000px;
+      padding-bottom: 60px;
+    }
+
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .link-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .link-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      background-color: var(--bg-hover);
+    }
+
+    .link-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      padding-right: 24px; /* Espacio para el botón de borrar */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-delete-card {
+      position: absolute;
+      top: 16px;
+      right: 16px;
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 1.5rem;
       cursor: pointer;
-      transition: color var(--transition), transform var(--transition);
-      padding: 8px;
-      border-radius: 50%;
+      font-size: 1.1rem;
+      padding: 4px;
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity var(--transition), color var(--transition), background var(--transition);
     }
 
-    .btn-icon:hover {
-      color: var(--accent);
-      transform: rotate(90deg);
-      background: var(--card-bg);
+    .link-card:hover .btn-delete-card {
+      opacity: 1;
     }
 
-    .container {
-      width: 100%;
-      max-width: 800px;
-      position: relative;
+    .btn-delete-card:hover {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
     }
 
-    /* Vistas */
-    .view {
+    /* Modal para agregar enlace */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
       display: none;
-      animation: fadeIn 0.3s ease forwards;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
     }
-    .view.active {
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
+    .modal {
+      background: var(--bg-surface);
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
       display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Menú Principal Dinámico (Tarjetas Pequeñas) */
-    .menu-grid {
-      display: grid;
-      /* Se ajustó el minmax a 130px para hacerlas más pequeñas y compactas */
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 16px;
-      justify-content: center;
-    }
-
-    .menu-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 10px; /* Padding reducido */
-      text-align: center;
-      cursor: pointer;
-      transition: all var(--transition);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .menu-card:hover {
-      background-color: var(--card-hover);
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 6px 12px -6px rgba(56, 189, 248, 0.3);
-    }
-
-    .menu-card .icon {
-      font-size: 2rem; /* Icono más pequeño */
-      margin-bottom: 10px;
-    }
-
-    .menu-card h2 {
-      font-size: 0.95rem; /* Letra más pequeña */
-      font-weight: 600;
-    }
-
-    /* Estilos Generales de Vistas */
-    .view-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 24px;
-      gap: 16px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 16px;
-    }
-
-    .btn-back {
-      background: var(--card-hover);
-      color: var(--text-main);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background var(--transition);
-    }
-
-    .btn-back:hover { background: var(--accent); color: #000; }
-
-    /* Módulos Específicos */
-    .link-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-    }
-
-    .link-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      background-color: var(--card-bg);
-      color: var(--text-main);
-      text-decoration: none;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      font-weight: 500;
-      transition: all var(--transition);
-    }
-
-    .link-btn:hover { background-color: var(--accent-hover); border-color: var(--accent); }
-
-    .copy-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-    }
-
-    .copy-item .info { display: flex; flex-direction: column; gap: 4px; }
-    .copy-item .label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-    .copy-item .value { font-family: monospace; font-size: 1.1rem; color: var(--text-main); }
-    
-    .btn-action {
-      background-color: var(--card-hover);
-      color: var(--text-main);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background var(--transition);
-    }
-    .btn-action:hover { background-color: var(--accent); color: #000; }
-    .btn-action.copied { background-color: var(--success); color: #fff; }
-    .btn-delete { background-color: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 6px 10px;}
-    .btn-delete:hover { background-color: var(--danger); color: #fff; }
-
-    /* Conversor */
-    .input-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    input, select {
-      background-color: var(--card-bg);
+    .input-group input {
+      width: 100%;
+      background: var(--bg-base);
       border: 1px solid var(--border);
       color: var(--text-main);
       padding: 12px;
       border-radius: 8px;
-      outline: none;
       font-size: 1rem;
+      outline: none;
+    }
+
+    .input-group input:focus { border-color: var(--accent); }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-cancel {
       flex: 1;
-      min-width: 120px;
-    }
-    input:focus, select:focus { border-color: var(--accent); }
-    .result-box {
-      padding: 20px;
-      background: var(--card-bg);
-      border-radius: 12px;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--accent);
-      border: 1px dashed var(--accent);
-    }
-
-    /* Modal / Configuración */
-    .config-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(5px);
-      display: none;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 20px;
-      z-index: 1000;
-      overflow-y: auto;
-    }
-
-    .config-overlay.active {
-      display: flex;
-    }
-
-    .config-modal {
-      background: var(--bg-color);
-      width: 100%;
-      max-width: 600px;
-      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-main);
       border: 1px solid var(--border);
-      padding: 30px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-      animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
     }
 
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95) translateY(-20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    .btn-cancel:hover { background: var(--bg-hover); }
+    
+    .btn-submit {
+      flex: 1;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .btn-submit:hover { background: var(--accent-hover); }
+
+    /* Estado vacío */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
     }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    .config-section { margin-bottom: 24px; background: var(--card-bg); padding: 16px; border-radius: 12px; }
-    .config-section h3 { margin-bottom: 12px; font-size: 1rem; color: var(--accent); }
-    .config-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .config-list-item { 
-      display: flex; justify-content: space-between; align-items: center; 
-      padding: 10px 12px; background: var(--bg-color); 
-      border-radius: 8px; border: 1px solid var(--border); 
-      font-size: 0.9rem;
-    }
-
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🚀 Mi Hub</h1>
-    <button class="btn-icon" onclick="toggleConfig()" title="Configuración">⚙️</button>
+  <header id="main-header">
+    <div class="header-top">
+      <h1>🔗 Mis Enlaces</h1>
+      <button class="btn-primary" onclick="toggleModal()">
+        <span>+</span> Nuevo Enlace
+      </button>
+    </div>
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." oninput="filterLinks()">
+    </div>
   </header>
 
-  <div class="container">
-    
-    <div id="view-menu" class="view active">
-      <div class="menu-grid" id="main-menu-grid">
-        </div>
-    </div>
-
-    <div id="view-links" class="view">
-      <div class="view-header">
-        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
-        <h2>🌐 Mis Sitios Frecuentes</h2>
+  <main>
+    <div class="links-grid" id="linksGrid">
       </div>
-      <div class="link-grid" id="links-container"></div>
-    </div>
+  </main>
 
-    <div id="view-accounts" class="view">
-      <div class="view-header">
-        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
-        <h2>💳 Datos y Cuentas</h2>
+  <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <h2>Agregar Nuevo Enlace</h2>
+      <div class="input-group">
+        <label for="linkName">Nombre del sitio</label>
+        <input type="text" id="linkName" placeholder="Ej. GitHub" autocomplete="off">
       </div>
-      <div id="accounts-container"></div>
-    </div>
-
-    <div id="view-converter" class="view">
-      <div class="view-header">
-        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
-        <h2>💱 Conversor de Moneda</h2>
+      <div class="input-group">
+        <label for="linkUrl">URL</label>
+        <input type="url" id="linkUrl" placeholder="https://..." autocomplete="off">
       </div>
-      <div class="input-row">
-        <input type="number" id="amount" placeholder="Monto" value="100" oninput="convertCurrency()" />
-        <select id="fromCurrency" onchange="convertCurrency()">
-          <option value="USD">USD</option>
-          <option value="PEN" selected>PEN</option>
-          <option value="EUR">EUR</option>
-        </select>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
+        <button class="btn-submit" onclick="saveLink()">Guardar</button>
       </div>
-      <div class="input-row">
-        <select id="toCurrency" onchange="convertCurrency()">
-          <option value="USD" selected>USD</option>
-          <option value="PEN">PEN</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
-      <div class="result-box" id="conversionResult">0.00 USD</div>
-    </div>
-    
-    <div id="custom-views-container"></div>
-
-  </div>
-
-  <div class="config-overlay" id="config-modal" onclick="closeConfigOutside(event)">
-    <div class="config-modal">
-      <div class="modal-header">
-        <h2>⚙️ Ajustes</h2>
-        <button class="btn-icon" onclick="toggleConfig()">✕</button>
-      </div>
-
-      <div class="config-section">
-        <h3>Tarjetas del Menú Principal</h3>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Crea o elimina los accesos directos de tu pantalla principal.</p>
-        <div class="input-row">
-          <input type="text" id="new-card-icon" placeholder="Emoji (ej. 📝)" style="flex: 0.3;" />
-          <input type="text" id="new-card-name" placeholder="Nombre de la tarjeta" />
-          <button class="btn-action" onclick="addCard()">Crear</button>
-        </div>
-        <div class="config-list" id="config-cards-list"></div>
-      </div>
-
-      <div class="config-section">
-        <h3>Agregar Sitio a "Mis Sitios"</h3>
-        <div class="input-row">
-          <input type="text" id="new-link-name" placeholder="Nombre" />
-          <input type="url" id="new-link-url" placeholder="URL (https://...)" />
-          <button class="btn-action" onclick="addLink()">Guardar</button>
-        </div>
-        <div class="config-list" id="config-links-list"></div>
-      </div>
-
-      <div class="config-section">
-        <h3>Agregar a "Datos Rápidos"</h3>
-        <div class="input-row">
-          <input type="text" id="new-acc-name" placeholder="Etiqueta (ej. DNI)" />
-          <input type="text" id="new-acc-val" placeholder="Valor a copiar" />
-          <button class="btn-action" onclick="addAccount()">Guardar</button>
-        </div>
-        <div class="config-list" id="config-accounts-list"></div>
-      </div>
-
     </div>
   </div>
 
   <script>
-    // --- DATOS POR DEFECTO ---
-    const defaultCards = [
-      { id: "view-links", icon: "🌐", name: "Mis Sitios" },
-      { id: "view-accounts", icon: "💳", name: "Datos Rápidos" },
-      { id: "view-converter", icon: "💱", name: "Conversor" }
-    ];
-
+    // Enlaces iniciales de ejemplo
     const defaultLinks = [
-      { name: "GitHub", url: "https://github.com" },
-      { name: "Render", url: "https://dashboard.render.com" }
+      { id: 1, name: "Universidad Científica del Sur", url: "https://www.cientifica.edu.pe" },
+      { id: 2, name: "Cambridge One", url: "https://www.cambridgeone.org" },
+      { id: 3, name: "Amazon KDP", url: "https://kdp.amazon.com" },
+      { id: 4, name: "Dota 2 Wiki", url: "https://dota2.fandom.com/wiki/Dota_2_Wiki" }
     ];
 
-    const defaultAccounts = [
-      { label: "BCP Soles", value: "191-12345678-0-99" }
-    ];
+    let links = JSON.parse(localStorage.getItem('pure_links')) || defaultLinks;
 
-    // Cargar desde LocalStorage
-    let cards = JSON.parse(localStorage.getItem('hub_cards')) || defaultCards;
-    let links = JSON.parse(localStorage.getItem('hub_links')) || defaultLinks;
-    let accounts = JSON.parse(localStorage.getItem('hub_accounts')) || defaultAccounts;
+    const linksGrid = document.getElementById('linksGrid');
+    const addModal = document.getElementById('addModal');
+    const searchInput = document.getElementById('searchInput');
 
-    function saveData() {
-      localStorage.setItem('hub_cards', JSON.stringify(cards));
-      localStorage.setItem('hub_links', JSON.stringify(links));
-      localStorage.setItem('hub_accounts', JSON.stringify(accounts));
-      renderAll();
-    }
+    // Sombra en el header al hacer scroll
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('main-header');
+      if (window.scrollY > 10) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    });
 
-    // --- NAVEGACIÓN Y MODAL ---
-    function openView(viewId) {
-      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-      const view = document.getElementById(viewId);
-      if (view) {
-        view.classList.add('active');
-      } else {
-        createCustomViewPlaceholder(viewId);
-      }
-    }
+    function renderLinks(linksToRender = links) {
+      linksGrid.innerHTML = '';
 
-    function toggleConfig() {
-      const modal = document.getElementById('config-modal');
-      modal.classList.toggle('active');
-    }
-
-    function closeConfigOutside(e) {
-      if(e.target.id === 'config-modal') toggleConfig();
-    }
-
-    // --- RENDERIZADO PRINCIPAL ---
-    function renderAll() {
-      // 1. Renderizar Tarjetas
-      const menuGrid = document.getElementById('main-menu-grid');
-      const configCardsList = document.getElementById('config-cards-list');
-      menuGrid.innerHTML = '';
-      configCardsList.innerHTML = '';
-
-      cards.forEach((card, index) => {
-        // En el inicio
-        menuGrid.innerHTML += `
-          <div class="menu-card" onclick="openView('${card.id}')">
-            <span class="icon">${card.icon}</span>
-            <h2>${card.name}</h2>
+      if (linksToRender.length === 0) {
+        linksGrid.innerHTML = `
+          <div class="empty-state">
+            <p style="font-size: 3rem; margin-bottom: 10px;">📭</p>
+            <p>No hay enlaces que coincidan.</p>
           </div>
         `;
-        // En la configuración (Ahora TODAS se pueden borrar)
-        configCardsList.innerHTML += `
-          <div class="config-list-item">
-            <span>${card.icon} ${card.name}</span>
-            <button class="btn-action btn-delete" onclick="deleteCard(${index})" title="Eliminar tarjeta">🗑️</button>
-          </div>
-        `;
-      });
-
-      // 2. Renderizar Enlaces
-      const linksContainer = document.getElementById('links-container');
-      const configLinks = document.getElementById('config-links-list');
-      linksContainer.innerHTML = '';
-      configLinks.innerHTML = '';
-
-      links.forEach((link, index) => {
-        linksContainer.innerHTML += `<a href="${link.url}" target="_blank" class="link-btn">${link.name}</a>`;
-        configLinks.innerHTML += `
-          <div class="config-list-item">
-            <span>${link.name} <small style="color:#94a3b8">(${link.url})</small></span>
-            <button class="btn-action btn-delete" onclick="deleteLink(${index})">🗑️</button>
-          </div>
-        `;
-      });
-
-      // 3. Renderizar Cuentas
-      const accountsContainer = document.getElementById('accounts-container');
-      const configAccounts = document.getElementById('config-accounts-list');
-      accountsContainer.innerHTML = '';
-      configAccounts.innerHTML = '';
-
-      accounts.forEach((acc, index) => {
-        accountsContainer.innerHTML += `
-          <div class="copy-item">
-            <div class="info">
-              <span class="label">${acc.label}</span>
-              <span class="value" id="val-${index}">${acc.value}</span>
-            </div>
-            <button class="btn-action" onclick="copyText('val-${index}', this)">Copiar</button>
-          </div>
-        `;
-        configAccounts.innerHTML += `
-          <div class="config-list-item">
-            <span>${acc.label}</span>
-            <button class="btn-action btn-delete" onclick="deleteAccount(${index})">🗑️</button>
-          </div>
-        `;
-      });
-    }
-
-    // --- GESTIÓN DE TARJETAS ---
-    function addCard() {
-      const icon = document.getElementById('new-card-icon').value || "📦";
-      const name = document.getElementById('new-card-name').value;
-      if (!name) return alert('Ponle un nombre a la tarjeta');
-      
-      const id = 'custom-view-' + Date.now(); 
-      cards.push({ id, icon, name });
-      
-      document.getElementById('new-card-icon').value = '';
-      document.getElementById('new-card-name').value = '';
-      saveData();
-    }
-
-    function deleteCard(index) {
-      // Pedimos confirmación rápida antes de borrar
-      if(confirm('¿Estás seguro de que deseas eliminar esta tarjeta?')) {
-        cards.splice(index, 1);
-        saveData();
-        openView('view-menu'); // Regresa al menú por si estábamos en esa tarjeta
-      }
-    }
-
-    function createCustomViewPlaceholder(viewId) {
-      const card = cards.find(c => c.id === viewId);
-      if(!card) return;
-
-      const container = document.getElementById('custom-views-container');
-      
-      if(document.getElementById(viewId)) {
-        document.getElementById(viewId).classList.add('active');
         return;
       }
 
-      const viewHtml = `
-        <div id="${viewId}" class="view active">
-          <div class="view-header">
-            <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
-            <h2>${card.icon} ${card.name}</h2>
-          </div>
-          <div style="padding: 40px; text-align: center; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border);">
-            <p>Sección en construcción.</p>
-            <p style="font-size: 0.9rem; margin-top:10px;">Contenido personalizado para ${card.name}.</p>
-          </div>
-        </div>
-      `;
-      container.insertAdjacentHTML('beforeend', viewHtml);
-    }
+      linksToRender.forEach(link => {
+        // Formatear URL para mostrarla bonita (quitar https://)
+        const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-    // --- UTILIDADES ---
-    function addLink() {
-      const name = document.getElementById('new-link-name').value;
-      let url = document.getElementById('new-link-url').value;
-      if (!name || !url) return;
-      if (!url.startsWith('http')) url = 'https://' + url;
-      links.push({ name, url });
-      document.getElementById('new-link-name').value = ''; document.getElementById('new-link-url').value = '';
-      saveData();
-    }
-    function deleteLink(index) { links.splice(index, 1); saveData(); }
-
-    function addAccount() {
-      const label = document.getElementById('new-acc-name').value;
-      const value = document.getElementById('new-acc-val').value;
-      if (!label || !value) return;
-      accounts.push({ label, value });
-      document.getElementById('new-acc-name').value = ''; document.getElementById('new-acc-val').value = '';
-      saveData();
-    }
-    function deleteAccount(index) { accounts.splice(index, 1); saveData(); }
-
-    function copyText(elementId, button) {
-      const text = document.getElementById(elementId).innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = button.innerText;
-        button.innerText = "¡Copiado!";
-        button.classList.add("copied");
-        setTimeout(() => { button.innerText = originalText; button.classList.remove("copied"); }, 1500);
+        const card = document.createElement('a');
+        card.href = link.url;
+        card.target = "_blank";
+        card.className = "link-card";
+        
+        card.innerHTML = `
+          <h3>${link.name}</h3>
+          <p>${displayUrl}</p>
+          <button class="btn-delete-card" onclick="deleteLink(${link.id}, event)" title="Eliminar">🗑️</button>
+        `;
+        
+        linksGrid.appendChild(card);
       });
     }
 
-    // Conversor
-    const rates = { USD: 1.00, PEN: 3.75, EUR: 0.92 };
-    function convertCurrency() {
-      const amount = parseFloat(document.getElementById("amount").value);
-      const from = document.getElementById("fromCurrency").value;
-      const to = document.getElementById("toCurrency").value;
-      const resultBox = document.getElementById("conversionResult");
-      if (isNaN(amount) || amount <= 0) { resultBox.innerText = "0.00"; return; }
-      resultBox.innerText = `${((amount / rates[from]) * rates[to]).toFixed(2)} ${to}`;
+    function toggleModal() {
+      addModal.classList.toggle('active');
+      if(addModal.classList.contains('active')) {
+        document.getElementById('linkName').focus();
+      }
     }
 
-    // Iniciar
-    renderAll();
-    convertCurrency();
+    function closeModalOutside(e) {
+      if(e.target === addModal) toggleModal();
+    }
+
+    function saveLink() {
+      const nameInput = document.getElementById('linkName');
+      let urlInput = document.getElementById('linkUrl').value;
+      const name = nameInput.value.trim();
+
+      if (!name || !urlInput) return alert('Por favor llena ambos campos');
+      
+      // Auto-completar https:// si falta
+      if (!/^https?:\/\//i.test(urlInput)) {
+        urlInput = 'https://' + urlInput;
+      }
+
+      const newLink = {
+        id: Date.now(),
+        name: name,
+        url: urlInput
+      };
+
+      links.unshift(newLink); // Agregar al principio
+      localStorage.setItem('pure_links', JSON.stringify(links));
+      
+      nameInput.value = '';
+      document.getElementById('linkUrl').value = '';
+      
+      toggleModal();
+      searchInput.value = ''; // Limpiar búsqueda
+      renderLinks();
+    }
+
+    function deleteLink(id, event) {
+      event.preventDefault(); // Evita que se abra el enlace al tocar el botón de borrar
+      
+      if(confirm('¿Eliminar este enlace?')) {
+        links = links.filter(link => link.id !== id);
+        localStorage.setItem('pure_links', JSON.stringify(links));
+        filterLinks(); // Mantener el filtro activo si se estaba buscando algo
+      }
+    }
+
+    function filterLinks() {
+      const query = searchInput.value.toLowerCase();
+      const filtered = links.filter(link => 
+        link.name.toLowerCase().includes(query) || 
+        link.url.toLowerCase().includes(query)
+      );
+      renderLinks(filtered);
+    }
+
+    // Inicializar
+    renderLinks();
   </script>
 </body>
 </html>
