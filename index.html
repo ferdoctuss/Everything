@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Bloqueo del Zoom a nivel meta-tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mis Enlaces</title>
   <style>
     :root {
@@ -33,6 +34,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      /* Bloquea el doble toque para hacer zoom (Safari) */
+      touch-action: manipulation;
     }
 
     .hidden {
@@ -414,6 +417,17 @@
         link.name.toLowerCase().includes(query) || link.url.toLowerCase().includes(query)
       ));
     }
+
+    // --- BLOQUEO DE ZOOM TÁCTIL (Pellizco / Safari iOS) ---
+    document.addEventListener('gesturestart', function (e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('touchmove', function(event) {
+      if (event.scale && event.scale !== 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>
