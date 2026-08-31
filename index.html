@@ -80,8 +80,7 @@
       font-size: 1.2rem;
       text-align: center;
       outline: none;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+      letter-spacing: 8px;
     }
 
     .pin-input-group input:focus {
@@ -251,7 +250,7 @@
     <div class="login-box">
       <h2>ACCESO RESTRINGIDO</h2>
       <div class="pin-input-group">
-        <input type="text" id="pin-input" placeholder="INGRESA EL PIN" autocomplete="off">
+        <input type="password" id="pin-input" inputmode="numeric" placeholder="••••" autocomplete="off" maxlength="4">
         <button class="btn-login" onclick="checkPin()">INGRESAR</button>
       </div>
       <div id="pin-error"></div>
@@ -291,10 +290,10 @@
 
   <script>
     // --- LÓGICA DEL PIN ---
-    const CORRECT_PIN = "2027LF";
+    const CORRECT_PIN = "2027";
     const pinInput = document.getElementById('pin-input');
 
-    // Revisar si ya había iniciado sesión (Manejo seguro de sessionStorage)
+    // Revisar si ya había iniciado sesión
     try {
       if (sessionStorage.getItem('isAuthenticated') === 'true') {
         unlockApp();
@@ -312,19 +311,16 @@
     function checkPin() {
       const errorDiv = document.getElementById('pin-error');
       
-      // ELIMINAMOS TODOS LOS ESPACIOS Y SÍMBOLOS ROTOS: Solo se quedan letras y números.
-      const enteredPin = pinInput.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      // Asegurarse de quitar cualquier espacio
+      const enteredPin = pinInput.value.replace(/\s+/g, '');
 
       if (enteredPin === CORRECT_PIN) {
         try {
           sessionStorage.setItem('isAuthenticated', 'true');
-        } catch(e) {
-          console.log("No se pudo usar sessionStorage, pero se permite el acceso.");
-        }
+        } catch(e) {}
         unlockApp();
       } else {
-        // MOSTRAR EXACTAMENTE LO QUE EL CÓDIGO LEYÓ PARA DEPURAR
-        errorDiv.innerText = `Incorrecto. El sistema leyó: "${enteredPin}"`;
+        errorDiv.innerText = "PIN incorrecto. Intenta de nuevo.";
         pinInput.value = '';
         pinInput.focus();
       }
