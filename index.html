@@ -16,7 +16,7 @@
       --danger: #ef4444;
       --success: #22c55e;
       --border: #334155;
-      --radius: 16px;
+      --radius: 12px;
       --transition: 0.3s ease;
     }
 
@@ -44,12 +44,12 @@
       align-items: center;
       width: 100%;
       max-width: 800px;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       padding: 0 10px;
     }
 
     header h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       color: var(--accent);
       letter-spacing: -0.5px;
     }
@@ -91,18 +91,20 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Menú Principal Dinámico */
+    /* Menú Principal Dinámico (Tarjetas Pequeñas) */
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      /* Se ajustó el minmax a 130px para hacerlas más pequeñas y compactas */
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+      justify-content: center;
     }
 
     .menu-card {
       background-color: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 30px 20px;
+      padding: 20px 10px; /* Padding reducido */
       text-align: center;
       cursor: pointer;
       transition: all var(--transition);
@@ -116,16 +118,16 @@
       background-color: var(--card-hover);
       transform: translateY(-4px);
       border-color: var(--accent);
-      box-shadow: 0 8px 16px -8px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 6px 12px -6px rgba(56, 189, 248, 0.3);
     }
 
     .menu-card .icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
+      font-size: 2rem; /* Icono más pequeño */
+      margin-bottom: 10px;
     }
 
     .menu-card h2 {
-      font-size: 1.1rem;
+      font-size: 0.95rem; /* Letra más pequeña */
       font-weight: 600;
     }
 
@@ -289,20 +291,16 @@
 
   <header>
     <h1>🚀 Mi Hub</h1>
-    <!-- Botón de configuración movido aquí -->
     <button class="btn-icon" onclick="toggleConfig()" title="Configuración">⚙️</button>
   </header>
 
   <div class="container">
     
-    <!-- VISTA 0: MENÚ PRINCIPAL DINÁMICO -->
     <div id="view-menu" class="view active">
       <div class="menu-grid" id="main-menu-grid">
-        <!-- Las tarjetas se inyectan por JS -->
-      </div>
+        </div>
     </div>
 
-    <!-- VISTA 1: ENLACES -->
     <div id="view-links" class="view">
       <div class="view-header">
         <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
@@ -311,7 +309,6 @@
       <div class="link-grid" id="links-container"></div>
     </div>
 
-    <!-- VISTA 2: DATOS RÁPIDOS -->
     <div id="view-accounts" class="view">
       <div class="view-header">
         <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
@@ -320,7 +317,6 @@
       <div id="accounts-container"></div>
     </div>
 
-    <!-- VISTA 3: CONVERSOR -->
     <div id="view-converter" class="view">
       <div class="view-header">
         <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
@@ -344,12 +340,10 @@
       <div class="result-box" id="conversionResult">0.00 USD</div>
     </div>
     
-    <!-- VISTAS PERSONALIZADAS (Contenedor) -->
     <div id="custom-views-container"></div>
 
   </div>
 
-  <!-- MODAL DE CONFIGURACIÓN -->
   <div class="config-overlay" id="config-modal" onclick="closeConfigOutside(event)">
     <div class="config-modal">
       <div class="modal-header">
@@ -357,10 +351,9 @@
         <button class="btn-icon" onclick="toggleConfig()">✕</button>
       </div>
 
-      <!-- Gestor de Tarjetas (Módulos) -->
       <div class="config-section">
-        <h3>Crear Nueva Tarjeta / Módulo</h3>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Crea tarjetas vacías para futuras herramientas.</p>
+        <h3>Tarjetas del Menú Principal</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Crea o elimina los accesos directos de tu pantalla principal.</p>
         <div class="input-row">
           <input type="text" id="new-card-icon" placeholder="Emoji (ej. 📝)" style="flex: 0.3;" />
           <input type="text" id="new-card-name" placeholder="Nombre de la tarjeta" />
@@ -369,7 +362,6 @@
         <div class="config-list" id="config-cards-list"></div>
       </div>
 
-      <!-- Agregar Enlace -->
       <div class="config-section">
         <h3>Agregar Sitio a "Mis Sitios"</h3>
         <div class="input-row">
@@ -380,7 +372,6 @@
         <div class="config-list" id="config-links-list"></div>
       </div>
 
-      <!-- Agregar Dato/Cuenta -->
       <div class="config-section">
         <h3>Agregar a "Datos Rápidos"</h3>
         <div class="input-row">
@@ -391,16 +382,15 @@
         <div class="config-list" id="config-accounts-list"></div>
       </div>
 
-      <button class="btn-action" style="width: 100%; margin-top: 10px; padding: 12px; background: var(--border);" onclick="location.reload()">🔄 Recargar Aplicación</button>
     </div>
   </div>
 
   <script>
     // --- DATOS POR DEFECTO ---
     const defaultCards = [
-      { id: "view-links", icon: "🌐", name: "Mis Sitios", isSystem: true },
-      { id: "view-accounts", icon: "💳", name: "Datos Rápidos", isSystem: true },
-      { id: "view-converter", icon: "💱", name: "Conversor", isSystem: true }
+      { id: "view-links", icon: "🌐", name: "Mis Sitios" },
+      { id: "view-accounts", icon: "💳", name: "Datos Rápidos" },
+      { id: "view-converter", icon: "💱", name: "Conversor" }
     ];
 
     const defaultLinks = [
@@ -431,7 +421,6 @@
       if (view) {
         view.classList.add('active');
       } else {
-        // Si es una vista custom que no existe en el HTML, la creamos temporalmente
         createCustomViewPlaceholder(viewId);
       }
     }
@@ -447,35 +436,30 @@
 
     // --- RENDERIZADO PRINCIPAL ---
     function renderAll() {
-      // Renderizar Tarjetas en el Menú Principal
+      // 1. Renderizar Tarjetas
       const menuGrid = document.getElementById('main-menu-grid');
       const configCardsList = document.getElementById('config-cards-list');
       menuGrid.innerHTML = '';
       configCardsList.innerHTML = '';
 
       cards.forEach((card, index) => {
-        // Tarjeta visual
+        // En el inicio
         menuGrid.innerHTML += `
           <div class="menu-card" onclick="openView('${card.id}')">
             <span class="icon">${card.icon}</span>
             <h2>${card.name}</h2>
           </div>
         `;
-
-        // Tarjeta en configuración (solo permite borrar las que no son del sistema)
-        const deleteBtn = card.isSystem ? 
-          `<span style="color:var(--text-muted); font-size:0.8rem;">Fija</span>` : 
-          `<button class="btn-action btn-delete" onclick="deleteCard(${index})">🗑️</button>`;
-
+        // En la configuración (Ahora TODAS se pueden borrar)
         configCardsList.innerHTML += `
           <div class="config-list-item">
             <span>${card.icon} ${card.name}</span>
-            ${deleteBtn}
+            <button class="btn-action btn-delete" onclick="deleteCard(${index})" title="Eliminar tarjeta">🗑️</button>
           </div>
         `;
       });
 
-      // Renderizar Enlaces
+      // 2. Renderizar Enlaces
       const linksContainer = document.getElementById('links-container');
       const configLinks = document.getElementById('config-links-list');
       linksContainer.innerHTML = '';
@@ -491,7 +475,7 @@
         `;
       });
 
-      // Renderizar Cuentas
+      // 3. Renderizar Cuentas
       const accountsContainer = document.getElementById('accounts-container');
       const configAccounts = document.getElementById('config-accounts-list');
       accountsContainer.innerHTML = '';
@@ -516,14 +500,14 @@
       });
     }
 
-    // --- GESTIÓN DE NUEVAS TARJETAS ---
+    // --- GESTIÓN DE TARJETAS ---
     function addCard() {
       const icon = document.getElementById('new-card-icon').value || "📦";
       const name = document.getElementById('new-card-name').value;
       if (!name) return alert('Ponle un nombre a la tarjeta');
       
-      const id = 'custom-view-' + Date.now(); // ID único
-      cards.push({ id, icon, name, isSystem: false });
+      const id = 'custom-view-' + Date.now(); 
+      cards.push({ id, icon, name });
       
       document.getElementById('new-card-icon').value = '';
       document.getElementById('new-card-name').value = '';
@@ -531,25 +515,25 @@
     }
 
     function deleteCard(index) {
-      cards.splice(index, 1);
-      saveData();
-      openView('view-menu'); // Por si estaba abierta
+      // Pedimos confirmación rápida antes de borrar
+      if(confirm('¿Estás seguro de que deseas eliminar esta tarjeta?')) {
+        cards.splice(index, 1);
+        saveData();
+        openView('view-menu'); // Regresa al menú por si estábamos en esa tarjeta
+      }
     }
 
-    // Generador de vista para tarjetas personalizadas
     function createCustomViewPlaceholder(viewId) {
       const card = cards.find(c => c.id === viewId);
       if(!card) return;
 
       const container = document.getElementById('custom-views-container');
       
-      // Si la vista ya existe, solo la mostramos
       if(document.getElementById(viewId)) {
         document.getElementById(viewId).classList.add('active');
         return;
       }
 
-      // Si no existe, creamos el HTML básico
       const viewHtml = `
         <div id="${viewId}" class="view active">
           <div class="view-header">
@@ -557,8 +541,8 @@
             <h2>${card.icon} ${card.name}</h2>
           </div>
           <div style="padding: 40px; text-align: center; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border);">
-            <p>Esta es una sección nueva.</p>
-            <p style="font-size: 0.9rem; margin-top:10px;">Podemos programar la funcionalidad que desees aquí dentro (Bloc de notas, Tareas, etc.)</p>
+            <p>Sección en construcción.</p>
+            <p style="font-size: 0.9rem; margin-top:10px;">Contenido personalizado para ${card.name}.</p>
           </div>
         </div>
       `;
