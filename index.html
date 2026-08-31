@@ -12,10 +12,10 @@
       --border: #3f3f46;
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
+      --accent: #f4f4f5; /* Acento blanco/minimalista */
+      --accent-hover: #ffffff;
       --danger: #ef4444;
-      --radius: 12px;
+      --radius: 8px; /* Bordes menos redondeados para un look más serio */
       --transition: 0.2s ease;
     }
 
@@ -23,113 +23,173 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       background-color: var(--bg-base);
       color: var(--text-main);
-      padding: 0 20px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* Cabecera y Buscador */
+    /* Ocultar elementos */
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- PANTALLA DE BLOQUEO (PIN) --- */
+    #login-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--bg-base);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .pin-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pin-input-group input {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: var(--radius);
+      font-size: 1.2rem;
+      text-align: center;
+      outline: none;
+      letter-spacing: 4px;
+    }
+
+    .pin-input-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-login {
+      background: var(--accent);
+      color: var(--bg-base);
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: opacity var(--transition);
+    }
+
+    .btn-login:hover {
+      opacity: 0.9;
+    }
+
+    #pin-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 12px;
+      min-height: 1.2em;
+    }
+
+    /* --- CONTENIDO PRINCIPAL DE LA APP --- */
+    #app-content {
+      width: 100%;
+      max-width: 900px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+
     header {
       width: 100%;
-      max-width: 1000px;
-      padding: 40px 0 30px 0;
+      padding: 30px 0 20px 0;
       position: sticky;
       top: 0;
       background: var(--bg-base);
       z-index: 10;
-      border-bottom: 1px solid transparent;
-      transition: border-bottom var(--transition);
-    }
-
-    header.scrolled {
-      border-bottom: 1px solid var(--border);
     }
 
     .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 600;
     }
 
     .btn-primary {
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.95rem;
+      background-color: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-weight: 500;
+      font-size: 0.85rem;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
-      transition: background var(--transition);
+      gap: 6px;
+      transition: all var(--transition);
     }
 
     .btn-primary:hover {
-      background-color: var(--accent-hover);
-    }
-
-    /* Buscador */
-    .search-container {
-      position: relative;
-      width: 100%;
+      background-color: var(--bg-surface);
+      border-color: var(--text-muted);
     }
 
     .search-container input {
       width: 100%;
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border);
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
       color: var(--text-main);
-      padding: 14px 20px 14px 44px;
-      border-radius: 10px;
-      font-size: 1rem;
+      padding: 10px 0;
+      font-size: 0.95rem;
       outline: none;
-      transition: border-color var(--transition), box-shadow var(--transition);
+      border-radius: 0;
+      transition: border-color var(--transition);
     }
 
     .search-container input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: var(--text-main);
     }
 
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-
-    /* Grid de Enlaces */
+    /* Grid de Enlaces (Más pequeñas y compactas) */
     main {
       width: 100%;
-      max-width: 1000px;
       padding-bottom: 60px;
     }
 
     .links-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
       margin-top: 10px;
     }
 
@@ -137,33 +197,32 @@
       background-color: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 14px 16px; /* Padding reducido */
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      transition: border-color var(--transition), background var(--transition);
     }
 
     .link-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--accent);
+      border-color: var(--text-muted);
       background-color: var(--bg-hover);
     }
 
     .link-card h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      padding-right: 24px; /* Espacio para el botón de borrar */
+      font-size: 0.9rem; /* Letra más pequeña */
+      font-weight: 500;
+      margin-bottom: 4px;
+      padding-right: 20px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .link-card p {
-      font-size: 0.85rem;
+      font-size: 0.75rem; /* URL más discreta */
       color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
@@ -172,33 +231,25 @@
 
     .btn-delete-card {
       position: absolute;
-      top: 16px;
-      right: 16px;
+      top: 12px;
+      right: 12px;
       background: transparent;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 1.1rem;
-      padding: 4px;
-      border-radius: 4px;
+      font-size: 0.9rem;
       opacity: 0;
-      transition: opacity var(--transition), color var(--transition), background var(--transition);
+      transition: opacity var(--transition), color var(--transition);
     }
 
-    .link-card:hover .btn-delete-card {
-      opacity: 1;
-    }
+    .link-card:hover .btn-delete-card { opacity: 1; }
+    .btn-delete-card:hover { color: var(--danger); }
 
-    .btn-delete-card:hover {
-      color: var(--danger);
-      background: rgba(239, 68, 68, 0.1);
-    }
-
-    /* Modal para agregar enlace */
+    /* Modal Minimalista */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(9, 9, 11, 0.8);
       backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
@@ -206,126 +257,116 @@
       z-index: 100;
     }
 
-    .modal-overlay.active {
-      display: flex;
-      animation: fadeIn 0.2s ease forwards;
-    }
+    .modal-overlay.active { display: flex; }
 
     .modal {
-      background: var(--bg-surface);
+      background: var(--bg-base);
       width: 100%;
-      max-width: 400px;
+      max-width: 360px;
       padding: 24px;
-      border-radius: 16px;
+      border-radius: var(--radius);
       border: 1px solid var(--border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
     .modal h2 {
       margin-bottom: 20px;
-      font-size: 1.3rem;
+      font-size: 1rem;
+      font-weight: 500;
     }
 
-    .input-group {
-      margin-bottom: 16px;
-    }
-
-    .input-group label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
+    .input-group { margin-bottom: 16px; }
     .input-group input {
       width: 100%;
-      background: var(--bg-base);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 1rem;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
       outline: none;
     }
-
-    .input-group input:focus { border-color: var(--accent); }
+    .input-group input:focus { border-color: var(--text-muted); }
 
     .modal-actions {
       display: flex;
-      gap: 12px;
-      margin-top: 24px;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel, .btn-submit {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: none;
     }
 
     .btn-cancel {
-      flex: 1;
       background: transparent;
       color: var(--text-main);
       border: 1px solid var(--border);
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
     }
-
-    .btn-cancel:hover { background: var(--bg-hover); }
+    .btn-cancel:hover { background: var(--bg-surface); }
     
     .btn-submit {
-      flex: 1;
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
+      background: var(--text-main);
+      color: var(--bg-base);
     }
-    
-    .btn-submit:hover { background: var(--accent-hover); }
+    .btn-submit:hover { opacity: 0.9; }
 
-    /* Estado vacío */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 40px 20px;
       color: var(--text-muted);
+      font-size: 0.9rem;
       grid-column: 1 / -1;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <header id="main-header">
-    <div class="header-top">
-      <h1>🔗 Mis Enlaces</h1>
-      <button class="btn-primary" onclick="toggleModal()">
-        <span>+</span> Nuevo Enlace
-      </button>
-    </div>
-    <div class="search-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." oninput="filterLinks()">
-    </div>
-  </header>
-
-  <main>
-    <div class="links-grid" id="linksGrid">
+  <div id="login-screen">
+    <div class="login-box">
+      <h2>ACCESO RESTRINGIDO</h2>
+      <div class="pin-input-group">
+        <input type="password" id="pin-input" placeholder="••••••" autocomplete="off">
+        <button class="btn-login" onclick="checkPin()">INGRESAR</button>
       </div>
-  </main>
+      <div id="pin-error"></div>
+    </div>
+  </div>
+
+  <div id="app-content" class="hidden">
+    <header id="main-header">
+      <div class="header-top">
+        <h1>Enlaces</h1>
+        <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
+      </div>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar..." oninput="filterLinks()">
+      </div>
+    </header>
+
+    <main>
+      <div class="links-grid" id="linksGrid"></div>
+    </main>
+  </div>
 
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
-      <h2>Agregar Nuevo Enlace</h2>
+      <h2>Nuevo Enlace</h2>
       <div class="input-group">
-        <label for="linkName">Nombre del sitio</label>
-        <input type="text" id="linkName" placeholder="Ej. GitHub" autocomplete="off">
+        <input type="text" id="linkName" placeholder="Nombre" autocomplete="off">
       </div>
       <div class="input-group">
-        <label for="linkUrl">URL</label>
-        <input type="url" id="linkUrl" placeholder="https://..." autocomplete="off">
+        <input type="url" id="linkUrl" placeholder="URL (ej. github.com)" autocomplete="off">
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
@@ -335,44 +376,62 @@
   </div>
 
   <script>
-    // Enlaces iniciales de ejemplo
+    // --- LÓGICA DEL PIN ---
+    const CORRECT_PIN = "2027LF";
+    const pinInput = document.getElementById('pin-input');
+
+    // Comprobar si ya iniciamos sesión en esta pestaña (se borra al cerrar el navegador)
+    if (sessionStorage.getItem('isAuthenticated') === 'true') {
+      unlockApp();
+    } else {
+      pinInput.focus();
+    }
+
+    // Permitir presionar "Enter" para ingresar
+    pinInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') checkPin();
+    });
+
+    function checkPin() {
+      const errorDiv = document.getElementById('pin-error');
+      if (pinInput.value.toUpperCase() === CORRECT_PIN) {
+        sessionStorage.setItem('isAuthenticated', 'true');
+        unlockApp();
+      } else {
+        errorDiv.innerText = "PIN incorrecto.";
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    }
+
+    function unlockApp() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-content').classList.remove('hidden');
+      renderLinks(); // Cargar enlaces solo cuando se desbloquea
+    }
+
+    // --- LÓGICA DE LOS ENLACES ---
     const defaultLinks = [
-      { id: 1, name: "Universidad Científica del Sur", url: "https://www.cientifica.edu.pe" },
-      { id: 2, name: "Cambridge One", url: "https://www.cambridgeone.org" },
-      { id: 3, name: "Amazon KDP", url: "https://kdp.amazon.com" },
-      { id: 4, name: "Dota 2 Wiki", url: "https://dota2.fandom.com/wiki/Dota_2_Wiki" }
+      { id: 1, name: "Render Dashboard", url: "https://dashboard.render.com" },
+      { id: 2, name: "Amazon KDP", url: "https://kdp.amazon.com" }
     ];
 
-    let links = JSON.parse(localStorage.getItem('pure_links')) || defaultLinks;
+    let links = JSON.parse(localStorage.getItem('min_links')) || defaultLinks;
 
     const linksGrid = document.getElementById('linksGrid');
     const addModal = document.getElementById('addModal');
     const searchInput = document.getElementById('searchInput');
 
-    // Sombra en el header al hacer scroll
-    window.addEventListener('scroll', () => {
-      const header = document.getElementById('main-header');
-      if (window.scrollY > 10) header.classList.add('scrolled');
-      else header.classList.remove('scrolled');
-    });
-
     function renderLinks(linksToRender = links) {
       linksGrid.innerHTML = '';
 
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `
-          <div class="empty-state">
-            <p style="font-size: 3rem; margin-bottom: 10px;">📭</p>
-            <p>No hay enlaces que coincidan.</p>
-          </div>
-        `;
+        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces.</div>`;
         return;
       }
 
       linksToRender.forEach(link => {
-        // Formatear URL para mostrarla bonita (quitar https://)
         const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-
         const card = document.createElement('a');
         card.href = link.url;
         card.target = "_blank";
@@ -381,18 +440,15 @@
         card.innerHTML = `
           <h3>${link.name}</h3>
           <p>${displayUrl}</p>
-          <button class="btn-delete-card" onclick="deleteLink(${link.id}, event)" title="Eliminar">🗑️</button>
+          <button class="btn-delete-card" onclick="deleteLink(${link.id}, event)" title="Eliminar">✕</button>
         `;
-        
         linksGrid.appendChild(card);
       });
     }
 
     function toggleModal() {
       addModal.classList.toggle('active');
-      if(addModal.classList.contains('active')) {
-        document.getElementById('linkName').focus();
-      }
+      if(addModal.classList.contains('active')) document.getElementById('linkName').focus();
     }
 
     function closeModalOutside(e) {
@@ -401,54 +457,36 @@
 
     function saveLink() {
       const nameInput = document.getElementById('linkName');
-      let urlInput = document.getElementById('linkUrl').value;
+      let urlInput = document.getElementById('linkUrl').value.trim();
       const name = nameInput.value.trim();
 
-      if (!name || !urlInput) return alert('Por favor llena ambos campos');
-      
-      // Auto-completar https:// si falta
-      if (!/^https?:\/\//i.test(urlInput)) {
-        urlInput = 'https://' + urlInput;
-      }
+      if (!name || !urlInput) return;
+      if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-      const newLink = {
-        id: Date.now(),
-        name: name,
-        url: urlInput
-      };
-
-      links.unshift(newLink); // Agregar al principio
-      localStorage.setItem('pure_links', JSON.stringify(links));
+      links.unshift({ id: Date.now(), name: name, url: urlInput });
+      localStorage.setItem('min_links', JSON.stringify(links));
       
-      nameInput.value = '';
-      document.getElementById('linkUrl').value = '';
-      
+      nameInput.value = ''; document.getElementById('linkUrl').value = '';
       toggleModal();
-      searchInput.value = ''; // Limpiar búsqueda
+      searchInput.value = '';
       renderLinks();
     }
 
     function deleteLink(id, event) {
-      event.preventDefault(); // Evita que se abra el enlace al tocar el botón de borrar
-      
-      if(confirm('¿Eliminar este enlace?')) {
+      event.preventDefault();
+      if(confirm('¿Borrar enlace?')) {
         links = links.filter(link => link.id !== id);
-        localStorage.setItem('pure_links', JSON.stringify(links));
-        filterLinks(); // Mantener el filtro activo si se estaba buscando algo
+        localStorage.setItem('min_links', JSON.stringify(links));
+        filterLinks();
       }
     }
 
     function filterLinks() {
       const query = searchInput.value.toLowerCase();
-      const filtered = links.filter(link => 
-        link.name.toLowerCase().includes(query) || 
-        link.url.toLowerCase().includes(query)
-      );
-      renderLinks(filtered);
+      renderLinks(links.filter(link => 
+        link.name.toLowerCase().includes(query) || link.url.toLowerCase().includes(query)
+      ));
     }
-
-    // Inicializar
-    renderLinks();
   </script>
 </body>
 </html>
