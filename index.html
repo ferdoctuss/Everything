@@ -12,10 +12,10 @@
       --border: #3f3f46;
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
-      --accent: #f4f4f5; /* Acento blanco/minimalista */
+      --accent: #f4f4f5;
       --accent-hover: #ffffff;
       --danger: #ef4444;
-      --radius: 8px; /* Bordes menos redondeados para un look más serio */
+      --radius: 8px;
       --transition: 0.2s ease;
     }
 
@@ -35,7 +35,6 @@
       align-items: center;
     }
 
-    /* Ocultar elementos */
     .hidden {
       display: none !important;
     }
@@ -82,6 +81,7 @@
       text-align: center;
       outline: none;
       letter-spacing: 4px;
+      text-transform: uppercase; /* Para que siempre se vea en mayúsculas al escribir */
     }
 
     .pin-input-group input:focus {
@@ -180,7 +180,6 @@
       border-color: var(--text-main);
     }
 
-    /* Grid de Enlaces (Más pequeñas y compactas) */
     main {
       width: 100%;
       padding-bottom: 60px;
@@ -197,7 +196,7 @@
       background-color: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 16px; /* Padding reducido */
+      padding: 14px 16px; 
       text-decoration: none;
       color: inherit;
       display: flex;
@@ -212,7 +211,7 @@
     }
 
     .link-card h3 {
-      font-size: 0.9rem; /* Letra más pequeña */
+      font-size: 0.9rem;
       font-weight: 500;
       margin-bottom: 4px;
       padding-right: 20px;
@@ -222,7 +221,7 @@
     }
 
     .link-card p {
-      font-size: 0.75rem; /* URL más discreta */
+      font-size: 0.75rem; 
       color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
@@ -336,7 +335,7 @@
     <div class="login-box">
       <h2>ACCESO RESTRINGIDO</h2>
       <div class="pin-input-group">
-        <input type="password" id="pin-input" placeholder="••••••" autocomplete="off">
+        <input type="text" id="pin-input" placeholder="INGRESA EL PIN" autocomplete="off">
         <button class="btn-login" onclick="checkPin()">INGRESAR</button>
       </div>
       <div id="pin-error"></div>
@@ -380,25 +379,28 @@
     const CORRECT_PIN = "2027LF";
     const pinInput = document.getElementById('pin-input');
 
-    // Comprobar si ya iniciamos sesión en esta pestaña (se borra al cerrar el navegador)
+    // Comprobar si ya iniciamos sesión
     if (sessionStorage.getItem('isAuthenticated') === 'true') {
       unlockApp();
     } else {
       pinInput.focus();
     }
 
-    // Permitir presionar "Enter" para ingresar
     pinInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') checkPin();
     });
 
     function checkPin() {
       const errorDiv = document.getElementById('pin-error');
-      if (pinInput.value.toUpperCase() === CORRECT_PIN) {
+      
+      // LA CORRECCIÓN: .trim() quita los espacios al inicio y final
+      const enteredPin = pinInput.value.trim().toUpperCase();
+
+      if (enteredPin === CORRECT_PIN) {
         sessionStorage.setItem('isAuthenticated', 'true');
         unlockApp();
       } else {
-        errorDiv.innerText = "PIN incorrecto.";
+        errorDiv.innerText = "PIN incorrecto. Intenta de nuevo.";
         pinInput.value = '';
         pinInput.focus();
       }
@@ -407,7 +409,7 @@
     function unlockApp() {
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('app-content').classList.remove('hidden');
-      renderLinks(); // Cargar enlaces solo cuando se desbloquea
+      renderLinks(); 
     }
 
     // --- LÓGICA DE LOS ENLACES ---
@@ -426,7 +428,7 @@
       linksGrid.innerHTML = '';
 
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces.</div>`;
+        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces guardados.</div>`;
         return;
       }
 
