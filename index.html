@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Hub Personal</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-hover: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #22c55e;
+      --border: #334155;
+      --radius: 12px;
+      --transition: 0.2s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 32px auto;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* Estilo de Tarjetas Principales */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Módulo 1: Enlaces */
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background-color: var(--card-hover);
+      color: var(--text-main);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .link-btn:hover {
+      background-color: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Módulo 2: Cuentas y Copiado */
+    .copy-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .copy-item .info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .copy-item .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .copy-item .value {
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .btn-copy {
+      background-color: var(--card-hover);
+      color: var(--text-main);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background var(--transition);
+    }
+
+    .btn-copy:hover {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .btn-copy.copied {
+      background-color: var(--success);
+      color: #fff;
+    }
+
+    /* Módulo 3: Conversor */
+    .converter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input, select {
+      background-color: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px;
+      border-radius: 8px;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    input[type="number"] {
+      flex: 1;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    .result-box {
+      margin-top: 8px;
+      padding: 12px;
+      background: #0f172a;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--accent);
+      border: 1px dashed var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 Mi Hub Personal</h1>
+    <p>Dashboard de utilidades y accesos rápidos</p>
+  </header>
+
+  <div class="container">
+
+    <section class="card">
+      <h2>📌 Sitios Frecuentes</h2>
+      <div class="link-grid">
+        <a href="https://github.com" target="_blank" class="link-btn">GitHub</a>
+        <a href="https://youtube.com" target="_blank" class="link-btn">YouTube</a>
+        <a href="https://chatgpt.com" target="_blank" class="link-btn">ChatGPT</a>
+        <a href="https://notion.so" target="_blank" class="link-btn">Notion</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>💳 Copiar Cuentas & Datos</h2>
+      
+      <div class="copy-item">
+        <div class="info">
+          <span class="label">BCP Soles</span>
+          <span class="value" id="val-1">191-12345678-0-99</span>
+        </div>
+        <button class="btn-copy" onclick="copyText('val-1', this)">Copiar</button>
+      </div>
+
+      <div class="copy-item">
+        <div class="info">
+          <span class="label">CCI Interbancario</span>
+          <span class="value" id="val-2">002-191-001234567899-52</span>
+        </div>
+        <button class="btn-copy" onclick="copyText('val-2', this)">Copiar</button>
+      </div>
+
+      <div class="copy-item">
+        <div class="info">
+          <span class="label">DNI / Documento</span>
+          <span class="value" id="val-3">72345678</span>
+        </div>
+        <button class="btn-copy" onclick="copyText('val-3', this)">Copiar</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>💱 Conversor de Moneda</h2>
+      <div class="converter-group">
+        <div class="input-row">
+          <input type="number" id="amount" placeholder="Monto" value="100" oninput="convertCurrency()" />
+          <select id="fromCurrency" onchange="convertCurrency()">
+            <option value="USD">USD</option>
+            <option value="PEN" selected>PEN</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+
+        <div class="input-row">
+          <select id="toCurrency" style="width: 100%;" onchange="convertCurrency()">
+            <option value="USD" selected>USD (Dólar)</option>
+            <option value="PEN">PEN (Sol)</option>
+            <option value="EUR">EUR (Euro)</option>
+          </select>
+        </div>
+
+        <div class="result-box" id="conversionResult">
+          0.00 USD
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // 1. Función de Copiado al Portapapeles
+    function copyText(elementId, button) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.innerText;
+        button.innerText = "¡Copiado!";
+        button.classList.add("copied");
+
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove("copied");
+        }, 1500);
+      });
+    }
+
+    // 2. Lógica del Conversor de Monedas (Tasas base editables)
+    // Tasa base relativa a 1 USD (Ajustar según necesidad)
+    const rates = {
+      USD: 1.00,
+      PEN: 3.75, // 1 USD = 3.75 PEN
+      EUR: 0.92  // 1 USD = 0.92 EUR
+    };
+
+    function convertCurrency() {
+      const amount = parseFloat(document.getElementById("amount").value);
+      const from = document.getElementById("fromCurrency").value;
+      const to = document.getElementById("toCurrency").value;
+      const resultBox = document.getElementById("conversionResult");
+
+      if (isNaN(amount) || amount <= 0) {
+        resultBox.innerText = "Ingresa un monto válido";
+        return;
+      }
+
+      // Conversión: Pasar a USD base y luego a la moneda destino
+      const amountInUSD = amount / rates[from];
+      const converted = amountInUSD * rates[to];
+
+      resultBox.innerText = `${converted.toFixed(2)} ${to}`;
+    }
+
+    // Ejecutar conversión inicial al cargar
+    convertCurrency();
+  </script>
+</body>
+</html>
