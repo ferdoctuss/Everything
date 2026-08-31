@@ -13,17 +13,18 @@
       --text-muted: #94a3b8;
       --accent: #38bdf8;
       --accent-hover: #0284c7;
+      --danger: #ef4444;
       --success: #22c55e;
       --border: #334155;
-      --radius: 12px;
-      --transition: 0.2s ease;
+      --radius: 16px;
+      --transition: 0.3s ease;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     body {
@@ -31,56 +32,104 @@
       color: var(--text-main);
       padding: 24px;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     header {
-      max-width: 1200px;
-      margin: 0 auto 32px auto;
       text-align: center;
+      margin-bottom: 40px;
+      width: 100%;
     }
 
     header h1 {
-      font-size: 2rem;
+      font-size: 2.2rem;
       color: var(--accent);
-      margin-bottom: 6px;
-    }
-
-    header p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
+      letter-spacing: -0.5px;
     }
 
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      width: 100%;
+      max-width: 800px;
     }
 
-    /* Estilo de Tarjetas Principales */
-    .card {
+    /* Vistas */
+    .view {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Menú Principal Elegante */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .menu-card {
       background-color: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
     }
 
-    .card h2 {
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+    .menu-card:hover {
+      background-color: var(--card-hover);
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 20px -10px rgba(56, 189, 248, 0.2);
+    }
+
+    .menu-card .icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .menu-card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    /* Contenido de las Vistas */
+    .view-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      margin-bottom: 24px;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
     }
 
-    /* Módulo 1: Enlaces */
+    .btn-back {
+      background: var(--card-hover);
+      color: var(--text-main);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background var(--transition);
+    }
+
+    .btn-back:hover { background: var(--accent); color: #000; }
+
+    /* Módulo: Enlaces */
     .link-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
     }
 
@@ -88,204 +137,304 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px;
-      background-color: var(--card-hover);
+      padding: 16px;
+      background-color: var(--card-bg);
       color: var(--text-main);
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
       font-weight: 500;
-      transition: background var(--transition), transform var(--transition);
+      text-align: center;
+      transition: all var(--transition);
     }
 
     .link-btn:hover {
       background-color: var(--accent-hover);
-      transform: translateY(-2px);
+      border-color: var(--accent);
     }
 
-    /* Módulo 2: Cuentas y Copiado */
+    /* Módulo: Datos Rápidos */
     .copy-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0f172a;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
       border: 1px solid var(--border);
     }
 
-    .copy-item .info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .copy-item .label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .copy-item .value {
-      font-family: monospace;
-      font-size: 0.95rem;
-      color: var(--text-main);
-    }
-
-    .btn-copy {
+    .copy-item .info { display: flex; flex-direction: column; gap: 4px; }
+    .copy-item .label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .copy-item .value { font-family: monospace; font-size: 1.1rem; color: var(--text-main); }
+    
+    .btn-action {
       background-color: var(--card-hover);
       color: var(--text-main);
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       transition: background var(--transition);
     }
+    .btn-action:hover { background-color: var(--accent); color: #000; }
+    .btn-action.copied { background-color: var(--success); color: #fff; }
+    .btn-delete { background-color: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-delete:hover { background-color: var(--danger); color: #fff; }
 
-    .btn-copy:hover {
-      background-color: var(--accent);
-      color: #000;
-    }
-
-    .btn-copy.copied {
-      background-color: var(--success);
-      color: #fff;
-    }
-
-    /* Módulo 3: Conversor */
-    .converter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-    }
-
+    /* Módulo: Conversor */
+    .input-row { display: flex; gap: 12px; margin-bottom: 16px; }
     input, select {
-      background-color: #0f172a;
+      background-color: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       outline: none;
-      font-size: 0.95rem;
-    }
-
-    input[type="number"] {
+      font-size: 1rem;
       flex: 1;
     }
-
-    select {
-      cursor: pointer;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--accent);
-    }
-
+    input:focus, select:focus { border-color: var(--accent); }
     .result-box {
-      margin-top: 8px;
-      padding: 12px;
-      background: #0f172a;
-      border-radius: 8px;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1.5rem;
       font-weight: bold;
       color: var(--accent);
-      border: 1px dashed var(--border);
+      border: 1px dashed var(--accent);
     }
+
+    /* Configuración */
+    .config-section { margin-bottom: 32px; background: var(--card-bg); padding: 20px; border-radius: 12px; }
+    .config-section h3 { margin-bottom: 16px; font-size: 1.1rem; color: var(--accent); }
+    .config-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .config-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border); }
+    .btn-reload { width: 100%; padding: 16px; background-color: var(--card-hover); color: white; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-top: 20px; }
+    .btn-reload:hover { background-color: var(--accent); color: black; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🚀 Mi Hub Personal</h1>
-    <p>Dashboard de utilidades y accesos rápidos</p>
+    <h1>🚀 Mi Hub</h1>
   </header>
 
   <div class="container">
-
-    <section class="card">
-      <h2>📌 Sitios Frecuentes</h2>
-      <div class="link-grid">
-        <a href="https://github.com" target="_blank" class="link-btn">GitHub</a>
-        <a href="https://youtube.com" target="_blank" class="link-btn">YouTube</a>
-        <a href="https://chatgpt.com" target="_blank" class="link-btn">ChatGPT</a>
-        <a href="https://notion.so" target="_blank" class="link-btn">Notion</a>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>💳 Copiar Cuentas & Datos</h2>
-      
-      <div class="copy-item">
-        <div class="info">
-          <span class="label">BCP Soles</span>
-          <span class="value" id="val-1">191-12345678-0-99</span>
+    
+    <div id="view-menu" class="view active">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="openView('view-links')">
+          <span class="icon">🌐</span>
+          <h2>Mis Sitios</h2>
         </div>
-        <button class="btn-copy" onclick="copyText('val-1', this)">Copiar</button>
-      </div>
-
-      <div class="copy-item">
-        <div class="info">
-          <span class="label">CCI Interbancario</span>
-          <span class="value" id="val-2">002-191-001234567899-52</span>
+        <div class="menu-card" onclick="openView('view-accounts')">
+          <span class="icon">💳</span>
+          <h2>Datos Rápidos</h2>
         </div>
-        <button class="btn-copy" onclick="copyText('val-2', this)">Copiar</button>
-      </div>
-
-      <div class="copy-item">
-        <div class="info">
-          <span class="label">DNI / Documento</span>
-          <span class="value" id="val-3">72345678</span>
+        <div class="menu-card" onclick="openView('view-converter')">
+          <span class="icon">💱</span>
+          <h2>Conversor</h2>
         </div>
-        <button class="btn-copy" onclick="copyText('val-3', this)">Copiar</button>
+        <div class="menu-card" onclick="openView('view-config')">
+          <span class="icon">⚙️</span>
+          <h2>Configuración</h2>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="card">
-      <h2>💱 Conversor de Moneda</h2>
-      <div class="converter-group">
+    <div id="view-links" class="view">
+      <div class="view-header">
+        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
+        <h2>🌐 Mis Sitios Frecuentes</h2>
+      </div>
+      <div class="link-grid" id="links-container"></div>
+    </div>
+
+    <div id="view-accounts" class="view">
+      <div class="view-header">
+        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
+        <h2>💳 Datos y Cuentas</h2>
+      </div>
+      <div id="accounts-container"></div>
+    </div>
+
+    <div id="view-converter" class="view">
+      <div class="view-header">
+        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
+        <h2>💱 Conversor de Moneda</h2>
+      </div>
+      <div class="input-row">
+        <input type="number" id="amount" placeholder="Monto" value="100" oninput="convertCurrency()" />
+        <select id="fromCurrency" onchange="convertCurrency()">
+          <option value="USD">USD</option>
+          <option value="PEN" selected>PEN</option>
+          <option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="input-row">
+        <select id="toCurrency" onchange="convertCurrency()">
+          <option value="USD" selected>USD</option>
+          <option value="PEN">PEN</option>
+          <option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="result-box" id="conversionResult">0.00 USD</div>
+    </div>
+
+    <div id="view-config" class="view">
+      <div class="view-header">
+        <button class="btn-back" onclick="openView('view-menu')">← Volver</button>
+        <h2>⚙️ Configuración del Hub</h2>
+      </div>
+
+      <div class="config-section">
+        <h3>Agregar Nuevo Sitio</h3>
         <div class="input-row">
-          <input type="number" id="amount" placeholder="Monto" value="100" oninput="convertCurrency()" />
-          <select id="fromCurrency" onchange="convertCurrency()">
-            <option value="USD">USD</option>
-            <option value="PEN" selected>PEN</option>
-            <option value="EUR">EUR</option>
-          </select>
+          <input type="text" id="new-link-name" placeholder="Nombre (ej. Notion)" />
+          <input type="url" id="new-link-url" placeholder="URL (https://...)" />
+          <button class="btn-action" onclick="addLink()">Guardar</button>
         </div>
-
-        <div class="input-row">
-          <select id="toCurrency" style="width: 100%;" onchange="convertCurrency()">
-            <option value="USD" selected>USD (Dólar)</option>
-            <option value="PEN">PEN (Sol)</option>
-            <option value="EUR">EUR (Euro)</option>
-          </select>
-        </div>
-
-        <div class="result-box" id="conversionResult">
-          0.00 USD
-        </div>
+        <div class="config-list" id="config-links-list"></div>
       </div>
-    </section>
+
+      <div class="config-section">
+        <h3>Agregar Nuevo Dato / Cuenta</h3>
+        <div class="input-row">
+          <input type="text" id="new-acc-name" placeholder="Etiqueta (ej. DNI)" />
+          <input type="text" id="new-acc-val" placeholder="Valor a copiar" />
+          <button class="btn-action" onclick="addAccount()">Guardar</button>
+        </div>
+        <div class="config-list" id="config-accounts-list"></div>
+      </div>
+
+      <button class="btn-reload" onclick="location.reload()">🔄 Recargar Página</button>
+    </div>
 
   </div>
 
   <script>
-    // 1. Función de Copiado al Portapapeles
+    // --- DATOS POR DEFECTO Y LOCALSTORAGE ---
+    const defaultLinks = [
+      { name: "GitHub", url: "https://github.com" },
+      { name: "Render", url: "https://dashboard.render.com" },
+      { name: "Cambridge One", url: "https://www.cambridgeone.org" },
+      { name: "Universidad", url: "https://www.cientifica.edu.pe" }
+    ];
+
+    const defaultAccounts = [
+      { label: "BCP Soles", value: "191-12345678-0-99" },
+      { label: "DNI", value: "72345678" }
+    ];
+
+    let links = JSON.parse(localStorage.getItem('hub_links')) || defaultLinks;
+    let accounts = JSON.parse(localStorage.getItem('hub_accounts')) || defaultAccounts;
+
+    function saveData() {
+      localStorage.setItem('hub_links', JSON.stringify(links));
+      localStorage.setItem('hub_accounts', JSON.stringify(accounts));
+      renderAll();
+    }
+
+    // --- NAVEGACIÓN ---
+    function openView(viewId) {
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    // --- RENDERIZADO DE INTERFAZ ---
+    function renderAll() {
+      // 1. Renderizar Enlaces
+      const linksContainer = document.getElementById('links-container');
+      const configLinks = document.getElementById('config-links-list');
+      linksContainer.innerHTML = '';
+      configLinks.innerHTML = '';
+
+      links.forEach((link, index) => {
+        // Para la vista principal
+        linksContainer.innerHTML += `<a href="${link.url}" target="_blank" class="link-btn">${link.name}</a>`;
+        
+        // Para la vista de configuración
+        configLinks.innerHTML += `
+          <div class="config-list-item">
+            <span>${link.name} <small style="color:#94a3b8">(${link.url})</small></span>
+            <button class="btn-action btn-delete" onclick="deleteLink(${index})">🗑️</button>
+          </div>
+        `;
+      });
+
+      // 2. Renderizar Cuentas
+      const accountsContainer = document.getElementById('accounts-container');
+      const configAccounts = document.getElementById('config-accounts-list');
+      accountsContainer.innerHTML = '';
+      configAccounts.innerHTML = '';
+
+      accounts.forEach((acc, index) => {
+        // Para la vista principal
+        accountsContainer.innerHTML += `
+          <div class="copy-item">
+            <div class="info">
+              <span class="label">${acc.label}</span>
+              <span class="value" id="val-${index}">${acc.value}</span>
+            </div>
+            <button class="btn-action" onclick="copyText('val-${index}', this)">Copiar</button>
+          </div>
+        `;
+
+        // Para la vista de configuración
+        configAccounts.innerHTML += `
+          <div class="config-list-item">
+            <span>${acc.label} <small style="color:#94a3b8">(${acc.value})</small></span>
+            <button class="btn-action btn-delete" onclick="deleteAccount(${index})">🗑️</button>
+          </div>
+        `;
+      });
+    }
+
+    // --- FUNCIONALIDADES DE EDICIÓN ---
+    function addLink() {
+      const name = document.getElementById('new-link-name').value;
+      let url = document.getElementById('new-link-url').value;
+      if (!name || !url) return alert('Completa ambos campos');
+      if (!url.startsWith('http')) url = 'https://' + url;
+      
+      links.push({ name, url });
+      document.getElementById('new-link-name').value = '';
+      document.getElementById('new-link-url').value = '';
+      saveData();
+    }
+
+    function deleteLink(index) {
+      links.splice(index, 1);
+      saveData();
+    }
+
+    function addAccount() {
+      const label = document.getElementById('new-acc-name').value;
+      const value = document.getElementById('new-acc-val').value;
+      if (!label || !value) return alert('Completa ambos campos');
+      
+      accounts.push({ label, value });
+      document.getElementById('new-acc-name').value = '';
+      document.getElementById('new-acc-val').value = '';
+      saveData();
+    }
+
+    function deleteAccount(index) {
+      accounts.splice(index, 1);
+      saveData();
+    }
+
+    // --- UTILIDADES ---
     function copyText(elementId, button) {
       const text = document.getElementById(elementId).innerText;
       navigator.clipboard.writeText(text).then(() => {
         const originalText = button.innerText;
         button.innerText = "¡Copiado!";
         button.classList.add("copied");
-
         setTimeout(() => {
           button.innerText = originalText;
           button.classList.remove("copied");
@@ -293,14 +442,8 @@
       });
     }
 
-    // 2. Lógica del Conversor de Monedas (Tasas base editables)
-    // Tasa base relativa a 1 USD (Ajustar según necesidad)
-    const rates = {
-      USD: 1.00,
-      PEN: 3.75, // 1 USD = 3.75 PEN
-      EUR: 0.92  // 1 USD = 0.92 EUR
-    };
-
+    // Conversor
+    const rates = { USD: 1.00, PEN: 3.75, EUR: 0.92 };
     function convertCurrency() {
       const amount = parseFloat(document.getElementById("amount").value);
       const from = document.getElementById("fromCurrency").value;
@@ -308,18 +451,16 @@
       const resultBox = document.getElementById("conversionResult");
 
       if (isNaN(amount) || amount <= 0) {
-        resultBox.innerText = "Ingresa un monto válido";
+        resultBox.innerText = "0.00";
         return;
       }
-
-      // Conversión: Pasar a USD base y luego a la moneda destino
       const amountInUSD = amount / rates[from];
       const converted = amountInUSD * rates[to];
-
       resultBox.innerText = `${converted.toFixed(2)} ${to}`;
     }
 
-    // Ejecutar conversión inicial al cargar
+    // Inicializar al cargar
+    renderAll();
     convertCurrency();
   </script>
 </body>
