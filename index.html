@@ -234,7 +234,7 @@
   <!-- Firebase SDKs (Modular v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -280,14 +280,8 @@
       } catch(e) {}
     }
 
-    // Asegurar persistencia local antes de manejar la redirección
-    setPersistence(auth, browserLocalPersistence)
-      .then(() => {
-        return getRedirectResult(auth);
-      })
-      .catch((error) => {
-        console.error("Error en persistencia o redirección:", error);
-      });
+    // Configurar persistencia local estricta
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -301,12 +295,15 @@
       }
     });
 
+    // Usar Popup en lugar de Redirección para evitar pérdida de contexto en Safari
     window.loginWithGoogle = async () => {
       try {
-        await signInWithRedirect(auth, provider);
+        const result = await signInWithPopup(auth, provider);
+        currentUser = result.user;
+        await fetchCloudLinks(currentUser.uid);
       } catch (error) {
-        console.error("Error al iniciar sesión:", error);
-        alert("No se pudo iniciar sesión con Google.");
+        console.error("Error al iniciar sesión con popup:", error);
+        alert("No se pudo iniciar sesión con Google. Asegúrate de permitir las ventanas emergentes.");
       }
     };
 
@@ -433,7 +430,6 @@
     window.deleteLink = async (id, event) => {
       event.preventDefault();
       if (confirm('¿Deseas eliminar este enlace?')) {
-        if (currentUsery) {} // no-op safeguard
         if (currentUser) {
           try {
             await deleteDoc(doc(db, "links", id));
