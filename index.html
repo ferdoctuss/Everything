@@ -37,7 +37,6 @@
       touch-action: manipulation;
     }
 
-    /* --- CONTENIDO PRINCIPAL --- */
     #app-content {
       width: 100%;
       max-width: 900px;
@@ -198,7 +197,6 @@
     .link-card:hover .btn-delete-card { opacity: 1; }
     .btn-delete-card:hover { color: var(--danger); }
 
-    /* Modal */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(6px);
@@ -236,10 +234,9 @@
   <!-- Firebase SDKs (Modular v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Tus credenciales reales integradas aquí
     const firebaseConfig = {
       apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
       authDomain: "el-baul-de-fernando.firebaseapp.com",
@@ -283,10 +280,14 @@
       } catch(e) {}
     }
 
-    // Comprobar el resultado al regresar de la redirección de Google
-    getRedirectResult(auth).catch((error) => {
-      console.error("Error en redirección de autenticación:", error);
-    });
+    // Asegurar persistencia local antes de manejar la redirección
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        return getRedirectResult(auth);
+      })
+      .catch((error) => {
+        console.error("Error en persistencia o redirección:", error);
+      });
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -432,6 +433,7 @@
     window.deleteLink = async (id, event) => {
       event.preventDefault();
       if (confirm('¿Deseas eliminar este enlace?')) {
+        if (currentUsery) {} // no-op safeguard
         if (currentUser) {
           try {
             await deleteDoc(doc(db, "links", id));
@@ -469,14 +471,10 @@
     document.addEventListener('touchmove', (event) => {
       if (event.scale && event.scale !== 1) event.preventDefault();
     }, { passive: false });
-
-    loadLocalLinks();
-    renderLinks(links);
   </script>
 </head>
 <body>
 
-  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-content">
     <header id="main-header">
       <div class="header-top">
@@ -486,7 +484,7 @@
         <div class="header-actions">
           <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
           <div id="authContainer">
-            <!-- Se llena dinámicamente si inicia sesión o no -->
+            <!-- Se llena dinámicamente -->
           </div>
         </div>
       </div>
@@ -499,7 +497,6 @@
     </main>
   </div>
 
-  <!-- MODAL DE NUEVO ENLACE -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
       <h2>Nuevo Enlace</h2>
