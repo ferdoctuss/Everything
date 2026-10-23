@@ -1,433 +1,283 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Bloqueo del Zoom a nivel meta-tag -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mis Enlaces</title>
-  <style>
-    :root {
-      --bg-base: #09090b;
-      --bg-surface: #18181b;
-      --bg-hover: #27272a;
-      --border: #3f3f46;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #f4f4f5;
-      --accent-hover: #ffffff;
-      --danger: #ef4444;
-      --radius: 8px;
-      --transition: 0.2s ease;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>El baúl de fernando</title>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
+    <!-- Icono para pantalla de inicio en iOS y favicon -->
+    <link rel="apple-touch-icon" href="iconop.png">
+    <link rel="icon" type="image/png" href="iconop.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="El Baúl">
 
-    body {
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      /* Bloquea el doble toque para hacer zoom (Safari) */
-      touch-action: manipulation;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    .hidden {
-      display: none !important;
-    }
+    <!-- Firebase SDKs (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    /* --- PANTALLA DE BLOQUEO (PIN) --- */
-    #login-screen {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--bg-base);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 320px;
-      text-align: center;
-    }
-
-    .login-box h2 {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin-bottom: 24px;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-    }
-
-    .pin-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .pin-input-group input {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 12px;
-      border-radius: var(--radius);
-      font-size: 1.2rem;
-      text-align: center;
-      outline: none;
-      letter-spacing: 8px;
-    }
-
-    .pin-input-group input:focus {
-      border-color: var(--accent);
-    }
-
-    .btn-login {
-      background: var(--accent);
-      color: var(--bg-base);
-      border: none;
-      padding: 12px;
-      border-radius: var(--radius);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: opacity var(--transition);
-    }
-
-    .btn-login:hover {
-      opacity: 0.9;
-    }
-
-    #pin-error {
-      color: var(--danger);
-      font-size: 0.85rem;
-      margin-top: 12px;
-      min-height: 1.2em;
-    }
-
-    /* --- CONTENIDO PRINCIPAL --- */
-    #app-content {
-      width: 100%;
-      max-width: 900px;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: fadeIn 0.4s ease;
-    }
-
-    header {
-      width: 100%;
-      padding: 30px 0 20px 0;
-      position: sticky;
-      top: 0;
-      background: var(--bg-base);
-      z-index: 10;
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    h1 { font-size: 1.2rem; font-weight: 600; }
-
-    .btn-primary {
-      background-color: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: var(--radius);
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all var(--transition);
-    }
-    .btn-primary:hover { background-color: var(--bg-surface); border-color: var(--text-muted); }
-
-    .search-container input {
-      width: 100%;
-      background-color: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 10px 0;
-      font-size: 0.95rem;
-      outline: none;
-      border-radius: 0;
-      transition: border-color var(--transition);
-    }
-    .search-container input:focus { border-color: var(--text-main); }
-
-    main { width: 100%; padding-bottom: 60px; }
-
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .link-card {
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px; 
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: border-color var(--transition), background var(--transition);
-    }
-    .link-card:hover { border-color: var(--text-muted); background-color: var(--bg-hover); }
-
-    .link-card h3 {
-      font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; padding-right: 20px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    .link-card p {
-      font-size: 0.75rem; color: var(--text-muted);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    .btn-delete-card {
-      position: absolute; top: 12px; right: 12px;
-      background: transparent; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 0.9rem; opacity: 0;
-      transition: opacity var(--transition), color var(--transition);
-    }
-    .link-card:hover .btn-delete-card { opacity: 1; }
-    .btn-delete-card:hover { color: var(--danger); }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(4px);
-      display: none; justify-content: center; align-items: center; z-index: 100;
-    }
-    .modal-overlay.active { display: flex; }
-
-    .modal {
-      background: var(--bg-base); width: 100%; max-width: 360px;
-      padding: 24px; border-radius: var(--radius); border: 1px solid var(--border);
-    }
-    .modal h2 { margin-bottom: 20px; font-size: 1rem; font-weight: 500; }
-    .input-group { margin-bottom: 16px; }
-    .input-group input {
-      width: 100%; background: var(--bg-surface); border: 1px solid var(--border);
-      color: var(--text-main); padding: 10px 12px; border-radius: var(--radius);
-      font-size: 0.9rem; outline: none;
-    }
-    .input-group input:focus { border-color: var(--text-muted); }
-
-    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
-    .btn-cancel, .btn-submit { flex: 1; padding: 10px; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem; font-weight: 500; border: none; }
-    .btn-cancel { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-    .btn-cancel:hover { background: var(--bg-surface); }
-    .btn-submit { background: var(--text-main); color: var(--bg-base); }
-    .btn-submit:hover { opacity: 0.9; }
-
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; grid-column: 1 / -1; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+    <style>
+        body { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-white font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <div id="login-screen">
-    <div class="login-box">
-      <h2>ACCESO RESTRINGIDO</h2>
-      <div class="pin-input-group">
-        <input type="password" id="pin-input" inputmode="numeric" placeholder="••••" autocomplete="off" maxlength="4">
-        <button class="btn-login" onclick="checkPin()">INGRESAR</button>
-      </div>
-      <div id="pin-error"></div>
-    </div>
-  </div>
+    <!-- Header con botón de Google y navegación -->
+    <header class="bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800 sticky top-0 z-50 px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div class="flex items-center justify-between w-full sm:w-auto">
+            <h1 class="text-lg sm:text-xl font-black tracking-wider text-red-600">EL BAÚL DE <span class="text-white">FERNANDO</span></h1>
 
-  <div id="app-content" class="hidden">
-    <header id="main-header">
-      <div class="header-top">
-        <h1>Enlaces</h1>
-        <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
-      </div>
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar..." oninput="filterLinks()">
-      </div>
+            <!-- Contenedor móvil para Google Auth -->
+            <div id="authContainerMobile" class="sm:hidden flex items-center"></div>
+        </div>
+
+        <!-- Pestañas de navegación -->
+        <nav class="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-2xl border border-zinc-800 w-full sm:w-auto justify-center">
+            <button id="navFeed" onclick="switchView('feed')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer bg-white text-zinc-950 shadow-md">
+                Recomendaciones
+            </button>
+            <button id="navWatchlist" onclick="switchView('watchlist')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer text-zinc-400 hover:text-white flex items-center justify-center gap-1.5">
+                <span>Por Ver</span>
+                <span id="badgeWatchlist" class="text-[10px] bg-red-600 text-white px-1.5 py-0.2 rounded-full font-bold">0</span>
+            </button>
+            <button id="navFavorites" onclick="switchView('favorites')" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer text-zinc-400 hover:text-white flex items-center justify-center gap-1.5">
+                <span>Favoritas</span>
+                <span id="badgeFavorites" class="text-[10px] bg-zinc-800 text-zinc-300 px-1.5 py-0.2 rounded-full font-bold">0</span>
+            </button>
+        </nav>
+
+        <!-- Contenedor Escritorio para Google Auth -->
+        <div id="authContainerDesktop" class="hidden sm:flex items-center gap-2"></div>
     </header>
-    <main>
-      <div class="links-grid" id="linksGrid"></div>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 sm:px-6 py-5 flex-grow space-y-5">
+
+        <!-- =================== VISTA 1: RECOMENDACIONES (FEED) =================== -->
+        <div id="viewFeed" class="space-y-5">
+            <section class="flex items-center justify-center gap-2 max-w-sm mx-auto">
+                <button id="filterAll" onclick="setTypeFilter('all')" class="flex-1 py-2 px-3 rounded-xl font-bold text-xs border transition active:scale-95 cursor-pointer bg-white text-zinc-950 border-white shadow-md">
+                    Todo
+                </button>
+                <button id="filterTv" onclick="setTypeFilter('tv')" class="flex-1 py-2 px-3 rounded-xl font-bold text-xs border transition active:scale-95 cursor-pointer bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700">
+                    Series
+                </button>
+                <button id="filterMovie" onclick="setTypeFilter('movie')" class="flex-1 py-2 px-3 rounded-xl font-bold text-xs border transition active:scale-95 cursor-pointer bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700">
+                    Películas
+                </button>
+            </section>
+
+            <section>
+                <div id="genresBar" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
+            </section>
+
+            <section class="space-y-6">
+                <div class="border-b border-zinc-800 pb-3">
+                    <h2 class="text-lg sm:text-xl font-bold text-zinc-100 border-l-4 border-red-600 pl-3">Recomendaciones para ti</h2>
+                </div>
+
+                <div id="recommendationsContainer" class="space-y-10">
+                    <p class="text-center text-zinc-500 py-20 bg-zinc-900/30 rounded-2xl border border-zinc-900 px-4 text-xs sm:text-sm">Inicia sesión con Google y registra tus películas/series en <strong>Favoritas</strong> para generar recomendaciones personalizadas.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- =================== VISTA 2: CATÁLOGO "POR VER" (WATCHLIST) =================== -->
+        <div id="viewWatchlist" class="hidden space-y-6">
+            <div class="border-b border-zinc-800 pb-3">
+                <h2 class="text-lg sm:text-xl font-bold text-zinc-100 border-l-4 border-red-600 pl-3">Mi Catálogo Por Ver</h2>
+                <p class="text-xs text-zinc-400 pl-3 mt-0.5">Títulos pendientes guardados o agregados manualmente.</p>
+            </div>
+
+            <!-- Buscador Manual para Agregar a "Por Ver" -->
+            <div class="max-w-xl mx-auto relative">
+                <input type="text" id="watchlistSearchInput" autocomplete="off" placeholder="Buscar película o serie para agregar a pendientes..." class="w-full bg-zinc-900 border border-zinc-700 px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-red-600 transition shadow-lg">
+                <div id="watchlistSuggestions" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-zinc-950 border border-zinc-800 rounded-2xl max-h-60 overflow-y-auto z-50 shadow-2xl"></div>
+            </div>
+
+            <!-- Cuadrícula con carátulas -->
+            <div id="watchlistGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </div>
+
+        <!-- =================== VISTA 3: MIS FAVORITAS / YA VISTAS =================== -->
+        <div id="viewFavorites" class="hidden space-y-6">
+            <div class="border-b border-zinc-800 pb-3">
+                <h2 class="text-lg sm:text-xl font-bold text-zinc-100 border-l-4 border-red-600 pl-3">Mis Películas y Series Vistas</h2>
+                <p class="text-xs text-zinc-400 pl-3 mt-0.5">La base para tus recomendaciones en la nube.</p>
+            </div>
+
+            <!-- Buscador de Favoritas -->
+            <div class="max-w-xl mx-auto relative">
+                <input type="text" id="favSearchInput" autocomplete="off" placeholder="Escribe para buscar y agregar (ej. Breaking Bad, Interstellar)..." class="w-full bg-zinc-900 border border-zinc-700 px-4 py-3 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-red-600 transition shadow-lg">
+                <div id="favSuggestions" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-zinc-950 border border-zinc-800 rounded-2xl max-h-60 overflow-y-auto z-50 shadow-2xl"></div>
+            </div>
+
+            <!-- Cuadrícula de Favoritas -->
+            <div id="favoritesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </div>
+
     </main>
-  </div>
 
-  <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
-    <div class="modal">
-      <h2>Nuevo Enlace</h2>
-      <div class="input-group">
-        <input type="text" id="linkName" placeholder="Nombre" autocomplete="off">
-      </div>
-      <div class="input-group">
-        <input type="url" id="linkUrl" placeholder="URL (ej. github.com)" autocomplete="off">
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
-        <button class="btn-submit" onclick="saveLink()">Guardar</button>
-      </div>
+    <!-- Modal de Detalles y Mapa de Calor -->
+    <div id="detailModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center p-3 sm:p-4">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-4xl rounded-2xl overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]">
+            <button id="closeModal" class="absolute top-3 right-3 text-zinc-400 hover:text-white text-xl font-bold z-10 bg-zinc-950/80 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">&times;</button>
+            <div id="modalBody" class="overflow-y-auto p-4 sm:p-6 space-y-6"></div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // --- LÓGICA DEL PIN ---
-    const CORRECT_PIN = "2027";
-    const pinInput = document.getElementById('pin-input');
+    <!-- Footer -->
+    <footer class="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-500">
+        El baúl de fernando — Catálogo y motor de recomendaciones con sincronización en la nube.
+    </footer>
 
-    // Revisar si ya había iniciado sesión
-    try {
-      if (sessionStorage.getItem('isAuthenticated') === 'true') {
-        unlockApp();
-      } else {
-        pinInput.focus();
-      }
-    } catch (e) {
-      pinInput.focus();
-    }
+    <!-- Script principal con Firebase y Google Auth integrados -->
+    <script>
+        // ==========================================
+        // 1. CONFIGURACIÓN DE FIREBASE (¡Reemplaza con tus credenciales!)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
 
-    pinInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') checkPin();
-    });
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    function checkPin() {
-      const errorDiv = document.getElementById('pin-error');
-      
-      // Asegurarse de quitar cualquier espacio
-      const enteredPin = pinInput.value.replace(/\s+/g, '');
+        let currentUser = null;
 
-      if (enteredPin === CORRECT_PIN) {
-        try {
-          sessionStorage.setItem('isAuthenticated', 'true');
-        } catch(e) {}
-        unlockApp();
-      } else {
-        errorDiv.innerText = "PIN incorrecto. Intenta de nuevo.";
-        pinInput.value = '';
-        pinInput.focus();
-      }
-    }
+        // ==========================================
+        // 2. COMPONENTE DE AUTENTICACIÓN DE GOOGLE
+        // ==========================================
+        function renderAuthUI() {
+            const mobileContainer = document.getElementById('authContainerMobile');
+            const desktopContainer = document.getElementById('authContainerDesktop');
 
-    function unlockApp() {
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('app-content').classList.remove('hidden');
-      renderLinks(); 
-    }
+            if (!mobileContainer || !desktopContainer) return;
 
-    // --- LÓGICA DE LOS ENLACES ---
-    const defaultLinks = [
-      { id: 1, name: "Render Dashboard", url: "https://dashboard.render.com" },
-      { id: 2, name: "Amazon KDP", url: "https://kdp.amazon.com" }
-    ];
+            if (currentUser) {
+                // Usuario autenticado
+                const html = `
+                    <div class="flex items-center gap-2 bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-full">
+                        <img src="${currentUser.photoURL || 'https://via.placeholder.com/32'}" alt="Avatar" class="w-6 h-6 rounded-full border border-zinc-700 object-cover">
+                        <span class="text-xs font-medium text-zinc-200 hidden md:inline">${currentUser.displayName || 'Usuario'}</span>
+                        <button onclick="logout()" class="text-xs text-zinc-400 hover:text-red-500 font-bold ml-1 cursor-pointer transition">Salir</button>
+                    </div>
+                `;
+                mobileContainer.innerHTML = html;
+                desktopContainer.innerHTML = html;
+            } else {
+                // Botón de iniciar sesión con Google
+                const html = `
+                    <button onclick="loginWithGoogle()" class="flex items-center gap-2 bg-white text-zinc-950 hover:bg-zinc-200 px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer shadow-md">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.18 21.32 7.23 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.44 8.14 0 9.99 0 12s.44 3.86 1.2 5.42l4.08-3.15z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.18 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                        </svg>
+                        <span>Entrar con Google</span>
+                    </button>
+                `;
+                mobileContainer.innerHTML = html;
+                desktopContainer.innerHTML = html;
+            }
+        }
 
-    let links = [];
-    try {
-      links = JSON.parse(localStorage.getItem('min_links')) || defaultLinks;
-    } catch(e) {
-      links = defaultLinks;
-    }
+        async function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                console.error("Error en autenticación:", error);
+                alert("No se pudo iniciar sesión con Google.");
+            }
+        }
 
-    const linksGrid = document.getElementById('linksGrid');
-    const addModal = document.getElementById('addModal');
-    const searchInput = document.getElementById('searchInput');
+        async function logout() {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+            }
+        }
 
-    function renderLinks(linksToRender = links) {
-      linksGrid.innerHTML = '';
+        // Escuchar cambios de estado de autenticación
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            renderAuthUI();
+            if (user) {
+                console.log("Usuario autenticado:", user.email);
+                // Aquí puedes disparar la carga de datos desde Firestore asociados al UID del usuario: user.uid
+                loadUserDataFromCloud(user.uid);
+            } else {
+                console.log("Usuario no autenticado");
+                clearLocalData();
+            }
+        });
 
-      if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces guardados.</div>`;
-        return;
-      }
+        // ==========================================
+        // 3. SINCRONIZACIÓN CON FIRESTORE (Ejemplo base)
+        // ==========================================
+        async function loadUserDataFromCloud(uid) {
+            try {
+                const docRef = db.collection('usersData').doc(uid);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    // Carga tus listas en memoria o localStorage local si existen
+                    console.log("Datos cargados de la nube:", data);
+                    // Ejemplo: favorites = data.favorites || []; watchlist = data.watchlist || [];
+                } else {
+                    // Crear documento inicial si no existe
+                    await docRef.set({ favorites: [], watchlist: [] });
+                }
+                // renderApp(); <- Llama a tu función para refrescar la interfaz
+            } catch (e) {
+                console.error("Error cargando datos de Firestore:", e);
+            }
+        }
 
-      linksToRender.forEach(link => {
-        const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-        const card = document.createElement('a');
-        card.href = link.url;
-        card.target = "_blank";
-        card.className = "link-card";
-        
-        card.innerHTML = `
-          <h3>${link.name}</h3>
-          <p>${displayUrl}</p>
-          <button class="btn-delete-card" onclick="deleteLink(${link.id}, event)" title="Eliminar">✕</button>
-        `;
-        linksGrid.appendChild(card);
-      });
-    }
+        async function saveUserDataToCloud() {
+            if (!currentUser) return;
+            try {
+                const docRef = db.collection('usersData').doc(currentUser.uid);
+                await docRef.set({
+                    favorites: window.favorites || [],
+                    watchlist: window.watchlist || [],
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (e) {
+                console.error("Error guardando datos en la nube:", e);
+            }
+        }
 
-    function toggleModal() {
-      addModal.classList.toggle('active');
-      if(addModal.classList.contains('active')) document.getElementById('linkName').focus();
-    }
+        function clearLocalData() {
+            // Limpiar estados locales o mostrar arrays vacíos al cerrar sesión
+            window.favorites = [];
+            window.watchlist = [];
+            // renderApp();
+        }
 
-    function closeModalOutside(e) {
-      if(e.target === addModal) toggleModal();
-    }
-
-    function saveLink() {
-      const nameInput = document.getElementById('linkName');
-      let urlInput = document.getElementById('linkUrl').value.trim();
-      const name = nameInput.value.trim();
-
-      if (!name || !urlInput) return;
-      if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
-
-      links.unshift({ id: Date.now(), name: name, url: urlInput });
-      try { localStorage.setItem('min_links', JSON.stringify(links)); } catch(e){}
-      
-      nameInput.value = ''; document.getElementById('linkUrl').value = '';
-      toggleModal();
-      searchInput.value = '';
-      renderLinks();
-    }
-
-    function deleteLink(id, event) {
-      event.preventDefault();
-      if(confirm('¿Borrar enlace?')) {
-        links = links.filter(link => link.id !== id);
-        try { localStorage.setItem('min_links', JSON.stringify(links)); } catch(e){}
-        filterLinks();
-      }
-    }
-
-    function filterLinks() {
-      const query = searchInput.value.toLowerCase();
-      renderLinks(links.filter(link => 
-        link.name.toLowerCase().includes(query) || link.url.toLowerCase().includes(query)
-      ));
-    }
-
-    // --- BLOQUEO DE ZOOM TÁCTIL (Pellizco / Safari iOS) ---
-    document.addEventListener('gesturestart', function (e) {
-      e.preventDefault();
-    });
-    
-    document.addEventListener('touchmove', function(event) {
-      if (event.scale && event.scale !== 1) {
-        event.preventDefault();
-      }
-    }, { passive: false });
-  </script>
+        // Carga inicial de UI Auth
+        document.addEventListener("DOMContentLoaded", () => {
+            renderAuthUI();
+        });
+    </script>
+    <script src="app.js?v=7.0"></script>
 </body>
 </html>
