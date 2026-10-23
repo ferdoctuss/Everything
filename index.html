@@ -236,17 +236,18 @@
   <!-- Firebase SDKs (Modular v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // TODO: Reemplaza con tus credenciales reales de Firebase
+    // Tus credenciales reales integradas aquí
     const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_DOMINIO.firebaseapp.com",
-      projectId: "TU_PROJECT_ID",
-      storageBucket: "TU_BUCKET.appspot.com",
-      messagingSenderId: "TU_MESSAGING_SENDER_ID",
-      appId: "TU_APP_ID"
+      apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
+      authDomain: "el-baul-de-fernando.firebaseapp.com",
+      projectId: "el-baul-de-fernando",
+      storageBucket: "el-baul-de-fernando.firebasestorage.app",
+      messagingSenderId: "648436947805",
+      appId: "1:648436947805:web:d38987be3123ce78f766b4",
+      measurementId: "G-X7RXQ53VSG"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -257,7 +258,6 @@
     let currentUser = null;
     let links = [];
 
-    // Valores por defecto locales si no hay nada guardado
     const defaultLinks = [
       { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com" },
       { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com" }
@@ -268,7 +268,6 @@
     const addModal = document.getElementById('addModal');
     const authContainer = document.getElementById('authContainer');
 
-    // Cargar inicial desde localStorage o por defecto
     function loadLocalLinks() {
       try {
         const stored = localStorage.getItem('min_links');
@@ -278,18 +277,20 @@
       }
     }
 
-    // Guardar en localStorage local
     function saveLocalLinks() {
       try {
         localStorage.setItem('min_links', JSON.stringify(links));
       } catch(e) {}
     }
 
-    // Escuchar estado de autenticación (Google opcional)
+    // Comprobar el resultado al regresar de la redirección de Google
+    getRedirectResult(auth).catch((error) => {
+      console.error("Error en redirección de autenticación:", error);
+    });
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        // Si inicia sesión, intentamos traer los enlaces de la nube de ese usuario
         await fetchCloudLinks(user.uid);
       } else {
         currentUser = null;
@@ -299,17 +300,15 @@
       }
     });
 
-    // Login con Google
     window.loginWithGoogle = async () => {
       try {
-        await signInWithPopup(auth, provider);
+        await signInWithRedirect(auth, provider);
       } catch (error) {
-        console.error("Error en autenticación:", error);
+        console.error("Error al iniciar sesión:", error);
         alert("No se pudo iniciar sesión con Google.");
       }
     };
 
-    // Logout
     window.logout = async () => {
       try {
         await signOut(auth);
@@ -318,7 +317,6 @@
       }
     };
 
-    // Obtener enlaces de Firestore
     async function fetchCloudLinks(uid) {
       try {
         const q = query(collection(db, "links"), where("uid", "==", uid));
@@ -328,9 +326,7 @@
           cloudLinks.push({ id: docSnap.id, ...docSnap.data() });
         });
         
-        // Si el usuario recién inicia sesión en la nube y tiene enlaces locales, opcionalmente los podemos sincronizar o usar los de la nube
         if (cloudLinks.length === 0) {
-          // Si la nube está vacía, subimos los locales actuales como primera vez
           loadLocalLinks();
           for (const l of links) {
             await addDoc(collection(db, "links"), {
@@ -354,7 +350,6 @@
       }
     }
 
-    // Actualizar interfaz según si hay sesión iniciada o no
     function updateAuthUI() {
       if (currentUser) {
         authContainer.innerHTML = `
@@ -364,7 +359,7 @@
       } else {
         authContainer.innerHTML = `
           <button class="btn-google-small" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
               <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
@@ -376,30 +371,22 @@
       }
     }
 
-    // Renderizar tarjetas de enlaces
     window.renderLinks = function(linksToRender) {
       linksGrid.innerHTML = '';
-
       if (linksToRender.length === 0) {
         linksGrid.innerHTML = `<div class="empty-state">No hay enlaces guardados.</div>`;
         return;
       }
-
       linksToRender.forEach(link => {
         const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
         let domain = '';
-        try {
-          domain = new URL(link.url).hostname;
-        } catch(e) {
-          domain = displayUrl.split('/')[0];
-        }
+        try { domain = new URL(link.url).hostname; } catch(e) { domain = displayUrl.split('/')[0]; }
         const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 
         const card = document.createElement('a');
         card.href = link.url;
         card.target = "_blank";
         card.className = "link-card";
-        
         card.innerHTML = `
           <div class="link-card-header">
             <img src="${faviconUrl}" class="link-favicon" onerror="this.style.display='none'">
@@ -412,7 +399,6 @@
       });
     }
 
-    // Guardar enlace (Local o Nube según estado)
     window.saveLink = async () => {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
@@ -422,23 +408,15 @@
       if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
       if (currentUser) {
-        // Guardar en Firestore si hay sesión
         try {
-          const newLink = {
-            uid: currentUser.uid,
-            name: name,
-            url: urlInput,
-            createdAt: Date.now()
-          };
+          const newLink = { uid: currentUser.uid, name: name, url: urlInput, createdAt: Date.now() };
           const docRef = await addDoc(collection(db, "links"), newLink);
           links.unshift({ id: docRef.id, ...newLink });
         } catch (e) {
-          console.error("Error al guardar en nube:", e);
           alert("No se pudo guardar en la nube.");
           return;
         }
       } else {
-        // Guardar localmente si no hay sesión
         const newLink = { id: Date.now().toString(), name: name, url: urlInput };
         links.unshift(newLink);
         saveLocalLinks();
@@ -451,7 +429,6 @@
       renderLinks(links);
     };
 
-    // Eliminar enlace
     window.deleteLink = async (id, event) => {
       event.preventDefault();
       if (confirm('¿Deseas eliminar este enlace?')) {
@@ -460,7 +437,6 @@
             await deleteDoc(doc(db, "links", id));
             links = links.filter(link => link.id !== id);
           } catch (e) {
-            console.error("Error al eliminar en nube:", e);
             alert("No se pudo eliminar.");
             return;
           }
@@ -472,7 +448,6 @@
       }
     };
 
-    // Filtrar enlaces localmente
     window.filterLinks = () => {
       const queryText = searchInput.value.toLowerCase();
       const filtered = links.filter(link => 
@@ -481,7 +456,6 @@
       renderLinks(filtered);
     };
 
-    // Control del Modal
     window.toggleModal = () => {
       addModal.classList.toggle('active');
       if(addModal.classList.contains('active')) document.getElementById('linkName').focus();
@@ -491,13 +465,11 @@
       if(e.target === addModal) toggleModal();
     };
 
-    // Bloqueo de zoom táctil
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('touchmove', (event) => {
       if (event.scale && event.scale !== 1) event.preventDefault();
     }, { passive: false });
 
-    // Carga inicial inmediata sin sesión requerida
     loadLocalLinks();
     renderLinks(links);
   </script>
