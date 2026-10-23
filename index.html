@@ -62,7 +62,7 @@
       align-items: center;
       margin-bottom: 20px;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .header-brand {
@@ -71,27 +71,37 @@
       gap: 10px;
     }
 
-    .user-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--border);
-    }
-
-    h1 { font-size: 1.1rem; font-weight: 600; }
+    h1 { font-size: 1.2rem; font-weight: 600; }
 
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
+    }
+
+    /* Estilo limpio para el bloque de usuario autenticado */
+    .user-profile-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px 4px 4px;
+      border-radius: 50px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .btn-primary, .btn-secondary, .btn-google-small {
       background-color: transparent;
       color: var(--text-main);
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: var(--radius);
       font-weight: 500;
       font-size: 0.85rem;
@@ -110,6 +120,7 @@
       background: #ffffff;
       color: #18181b;
       border: none;
+      padding: 8px 14px;
     }
     .btn-google-small:hover {
       opacity: 0.9;
@@ -117,8 +128,17 @@
     }
     .btn-google-small svg { width: 14px; height: 14px; }
 
-    .btn-logout { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
-    .btn-logout:hover { background-color: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
+    .btn-logout { 
+      color: var(--danger); 
+      border: none; 
+      padding: 4px 8px; 
+      font-size: 0.8rem;
+      background: transparent;
+    }
+    .btn-logout:hover { 
+      background-color: rgba(239, 68, 68, 0.1); 
+      border-radius: var(--radius);
+    }
 
     .search-container input {
       width: 100%;
@@ -280,7 +300,6 @@
       } catch(e) {}
     }
 
-    // Configurar persistencia local estricta
     setPersistence(auth, browserLocalPersistence).catch(console.error);
 
     onAuthStateChanged(auth, async (user) => {
@@ -295,7 +314,6 @@
       }
     });
 
-    // Usar Popup en lugar de Redirección para evitar pérdida de contexto en Safari
     window.loginWithGoogle = async () => {
       try {
         const result = await signInWithPopup(auth, provider);
@@ -351,13 +369,15 @@
     function updateAuthUI() {
       if (currentUser) {
         authContainer.innerHTML = `
-          <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
-          <button class="btn-secondary btn-logout" onclick="logout()">Salir</button>
+          <div class="user-profile-group">
+            <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
+            <button class="btn-logout" onclick="logout()">Salir</button>
+          </div>
         `;
       } else {
         authContainer.innerHTML = `
           <button class="btn-google-small" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
               <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
