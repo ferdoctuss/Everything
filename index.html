@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mis Enlaces - Cloud</title>
+  <title>Mis Enlaces - Híbrido Cloud</title>
   <style>
     :root {
       --bg-base: #09090b;
@@ -37,74 +37,6 @@
       touch-action: manipulation;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-    /* --- PANTALLA DE LOGIN CON GOOGLE --- */
-    #login-screen {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--bg-base);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 20px;
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 360px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      padding: 32px 24px;
-      border-radius: var(--radius);
-      text-align: center;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    }
-
-    .login-box h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-main);
-    }
-
-    .login-box p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .btn-google {
-      width: 100%;
-      background: #ffffff;
-      color: #18181b;
-      border: none;
-      padding: 12px;
-      border-radius: var(--radius);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: opacity var(--transition), transform var(--transition);
-    }
-
-    .btn-google:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
-    .btn-google svg {
-      width: 18px;
-      height: 18px;
-    }
-
     /* --- CONTENIDO PRINCIPAL --- */
     #app-content {
       width: 100%;
@@ -130,17 +62,19 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .user-avatar {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid var(--border);
@@ -151,9 +85,10 @@
     .header-actions {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
 
-    .btn-primary, .btn-secondary {
+    .btn-primary, .btn-secondary, .btn-google-small {
       background-color: transparent;
       color: var(--text-main);
       border: 1px solid var(--border);
@@ -167,7 +102,22 @@
       gap: 6px;
       transition: all var(--transition);
     }
-    .btn-primary:hover, .btn-secondary:hover { background-color: var(--bg-surface); border-color: var(--border-focus); }
+    .btn-primary:hover, .btn-secondary:hover, .btn-google-small:hover { 
+      background-color: var(--bg-surface); 
+      border-color: var(--border-focus); 
+    }
+    
+    .btn-google-small {
+      background: #ffffff;
+      color: #18181b;
+      border: none;
+    }
+    .btn-google-small:hover {
+      opacity: 0.9;
+      background: #ffffff;
+    }
+    .btn-google-small svg { width: 14px; height: 14px; }
+
     .btn-logout { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
     .btn-logout:hover { background-color: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
 
@@ -287,9 +237,9 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // TODO: Reemplaza con tu configuración de proyecto de Firebase
+    // TODO: Reemplaza con tus credenciales reales de Firebase
     const firebaseConfig = {
       apiKey: "TU_API_KEY",
       authDomain: "TU_DOMINIO.firebaseapp.com",
@@ -305,28 +255,47 @@
     const provider = new GoogleAuthProvider();
 
     let currentUser = null;
-    let linksCache = [];
+    let links = [];
 
-    // Elementos DOM
-    const loginScreen = document.getElementById('login-screen');
-    const appContent = document.getElementById('app-content');
+    // Valores por defecto locales si no hay nada guardado
+    const defaultLinks = [
+      { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com" },
+      { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com" }
+    ];
+
     const linksGrid = document.getElementById('linksGrid');
     const searchInput = document.getElementById('searchInput');
     const addModal = document.getElementById('addModal');
-    const userAvatar = document.getElementById('userAvatar');
+    const authContainer = document.getElementById('authContainer');
 
-    // Escuchar estado de autenticación
+    // Cargar inicial desde localStorage o por defecto
+    function loadLocalLinks() {
+      try {
+        const stored = localStorage.getItem('min_links');
+        links = stored ? JSON.parse(stored) : defaultLinks;
+      } catch(e) {
+        links = defaultLinks;
+      }
+    }
+
+    // Guardar en localStorage local
+    function saveLocalLinks() {
+      try {
+        localStorage.setItem('min_links', JSON.stringify(links));
+      } catch(e) {}
+    }
+
+    // Escuchar estado de autenticación (Google opcional)
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        if(user.photoURL) userAvatar.src = user.photoURL;
-        loginScreen.classList.add('hidden');
-        appContent.classList.remove('hidden');
-        await fetchLinks();
+        // Si inicia sesión, intentamos traer los enlaces de la nube de ese usuario
+        await fetchCloudLinks(user.uid);
       } else {
         currentUser = null;
-        appContent.classList.add('hidden');
-        loginScreen.classList.remove('hidden');
+        loadLocalLinks();
+        renderLinks(links);
+        updateAuthUI();
       }
     });
 
@@ -349,24 +318,65 @@
       }
     };
 
-    // Cargar enlaces de Firestore
-    async function fetchLinks() {
-      if (!currentUser) return;
+    // Obtener enlaces de Firestore
+    async function fetchCloudLinks(uid) {
       try {
-        const q = query(collection(db, "links"), where("uid", "==", currentUser.uid));
+        const q = query(collection(db, "links"), where("uid", "==", uid));
         const querySnapshot = await getDocs(q);
-        linksCache = [];
+        let cloudLinks = [];
         querySnapshot.forEach((docSnap) => {
-          linksCache.push({ id: docSnap.id, ...docSnap.data() });
+          cloudLinks.push({ id: docSnap.id, ...docSnap.data() });
         });
-        renderLinks(linksCache);
+        
+        // Si el usuario recién inicia sesión en la nube y tiene enlaces locales, opcionalmente los podemos sincronizar o usar los de la nube
+        if (cloudLinks.length === 0) {
+          // Si la nube está vacía, subimos los locales actuales como primera vez
+          loadLocalLinks();
+          for (const l of links) {
+            await addDoc(collection(db, "links"), {
+              uid: uid,
+              name: l.name,
+              url: l.url,
+              createdAt: Date.now()
+            });
+          }
+          await fetchCloudLinks(uid);
+          return;
+        }
+
+        links = cloudLinks;
+        renderLinks(links);
+        updateAuthUI();
       } catch (e) {
-        console.error("Error cargando enlaces:", e);
-        linksGrid.innerHTML = `<div class="empty-state">Error al cargar enlaces desde la nube.</div>`;
+        console.error("Error cargando desde la nube:", e);
+        loadLocalLinks();
+        renderLinks(links);
       }
     }
 
-    // Renderizar enlaces
+    // Actualizar interfaz según si hay sesión iniciada o no
+    function updateAuthUI() {
+      if (currentUser) {
+        authContainer.innerHTML = `
+          <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
+          <button class="btn-secondary btn-logout" onclick="logout()">Salir</button>
+        `;
+      } else {
+        authContainer.innerHTML = `
+          <button class="btn-google-small" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Sincronizar
+          </button>
+        `;
+      }
+    }
+
+    // Renderizar tarjetas de enlaces
     window.renderLinks = function(linksToRender) {
       linksGrid.innerHTML = '';
 
@@ -402,55 +412,70 @@
       });
     }
 
-    // Guardar nuevo enlace
+    // Guardar enlace (Local o Nube según estado)
     window.saveLink = async () => {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
       const name = nameInput.value.trim();
 
-      if (!name || !urlInput || !currentUser) return;
+      if (!name || !urlInput) return;
       if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-      try {
-        const newLink = {
-          uid: currentUser.uid,
-          name: name,
-          url: urlInput,
-          createdAt: Date.now()
-        };
-        const docRef = await addDoc(collection(db, "links"), newLink);
-        linksCache.unshift({ id: docRef.id, ...newLink });
-        
-        nameInput.value = '';
-        document.getElementById('linkUrl').value = '';
-        toggleModal();
-        searchInput.value = '';
-        renderLinks(linksCache);
-      } catch (e) {
-        console.error("Error al guardar:", e);
-        alert("No se pudo guardar el enlace.");
+      if (currentUser) {
+        // Guardar en Firestore si hay sesión
+        try {
+          const newLink = {
+            uid: currentUser.uid,
+            name: name,
+            url: urlInput,
+            createdAt: Date.now()
+          };
+          const docRef = await addDoc(collection(db, "links"), newLink);
+          links.unshift({ id: docRef.id, ...newLink });
+        } catch (e) {
+          console.error("Error al guardar en nube:", e);
+          alert("No se pudo guardar en la nube.");
+          return;
+        }
+      } else {
+        // Guardar localmente si no hay sesión
+        const newLink = { id: Date.now().toString(), name: name, url: urlInput };
+        links.unshift(newLink);
+        saveLocalLinks();
       }
+
+      nameInput.value = '';
+      document.getElementById('linkUrl').value = '';
+      toggleModal();
+      searchInput.value = '';
+      renderLinks(links);
     };
 
     // Eliminar enlace
     window.deleteLink = async (id, event) => {
       event.preventDefault();
       if (confirm('¿Deseas eliminar este enlace?')) {
-        try {
-          await deleteDoc(doc(db, "links", id));
-          linksCache = linksCache.filter(link => link.id !== id);
-          filterLinks();
-        } catch (e) {
-          console.error("Error al eliminar:", e);
-          alert("No se pudo eliminar el enlace.");
+        if (currentUser) {
+          try {
+            await deleteDoc(doc(db, "links", id));
+            links = links.filter(link => link.id !== id);
+          } catch (e) {
+            console.error("Error al eliminar en nube:", e);
+            alert("No se pudo eliminar.");
+            return;
+          }
+        } else {
+          links = links.filter(link => link.id !== id);
+          saveLocalLinks();
         }
+        filterLinks();
       }
     };
 
-    // Filtrar enlaces localmente por búsqueda instantánea
+    // Filtrar enlaces localmente
     window.filterLinks = () => {
       const queryText = searchInput.value.toLowerCase();
-      const filtered = linksCache.filter(link => 
+      const filtered = links.filter(link => 
         link.name.toLowerCase().includes(queryText) || link.url.toLowerCase().includes(queryText)
       );
       renderLinks(filtered);
@@ -466,43 +491,31 @@
       if(e.target === addModal) toggleModal();
     };
 
-    // Bloqueo de zoom táctil en móviles
+    // Bloqueo de zoom táctil
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('touchmove', (event) => {
       if (event.scale && event.scale !== 1) event.preventDefault();
     }, { passive: false });
+
+    // Carga inicial inmediata sin sesión requerida
+    loadLocalLinks();
+    renderLinks(links);
   </script>
 </head>
 <body>
 
-  <!-- PANTALLA DE ACCESO GOOGLE -->
-  <div id="login-screen">
-    <div class="login-box">
-      <h2>Mis Enlaces Cloud</h2>
-      <p>Inicia sesión con tu cuenta de Google para sincronizar tus accesos en todos tus dispositivos.</p>
-      <button class="btn-google" onclick="loginWithGoogle()">
-        <svg viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
-          <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
-          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
-        </svg>
-        Iniciar sesión con Google
-      </button>
-    </div>
-  </div>
-
   <!-- APLICACIÓN PRINCIPAL -->
-  <div id="app-content" class="hidden">
+  <div id="app-content">
     <header id="main-header">
       <div class="header-top">
         <div class="header-brand">
-          <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
           <h1>Mis Enlaces</h1>
         </div>
         <div class="header-actions">
           <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
-          <button class="btn-secondary btn-logout" onclick="logout()">Salir</button>
+          <div id="authContainer">
+            <!-- Se llena dinámicamente si inicia sesión o no -->
+          </div>
         </div>
       </div>
       <div class="search-container">
