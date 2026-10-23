@@ -2,29 +2,52 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <!-- Bloqueo absoluto de zoom y escala en dispositivos móviles -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mis Enlaces - Híbrido Cloud</title>
+  <title>Mis Enlaces — Hub Profesional</title>
   <style>
     :root {
       --bg-base: #09090b;
       --bg-surface: #121215;
-      --bg-hover: #1c1c21;
+      --bg-surface-hover: #18181b;
+      --bg-card: #121215;
+      --bg-card-hover: #18181b;
       --border: #27272a;
       --border-focus: #52525b;
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
       --accent: #f4f4f5;
       --accent-hover: #ffffff;
-      --danger: #ef4444;
+      --danger: #f87171;
+      --success: #34d399;
       --radius: 12px;
+      --radius-sm: 8px;
       --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Adaptabilidad inteligente a temas claros/oscuros del sistema si se desea, manteniendo el núcleo oscuro elegante */
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-base: #fafafa;
+        --bg-surface: #ffffff;
+        --bg-surface-hover: #f4f4f5;
+        --bg-card: #ffffff;
+        --bg-card-hover: #fcfcfc;
+        --border: #e4e4e7;
+        --border-focus: #a1a1aa;
+        --text-main: #09090b;
+        --text-muted: #71717a;
+        --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      }
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -34,44 +57,72 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      touch-action: manipulation;
+      touch-action: manipulation; /* Bloquea doble toque para zoom */
+      overflow-x: hidden;
+      padding-bottom: 40px;
     }
 
+    /* --- CONTENEDOR PRINCIPAL --- */
     #app-content {
       width: 100%;
-      max-width: 900px;
-      padding: 0 20px;
+      max-width: 1000px;
+      padding: 0 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.4s ease;
+      animation: fadeIn 0.3s ease;
     }
 
+    /* --- CABECERA PROFESIONAL --- */
     header {
       width: 100%;
-      padding: 30px 0 20px 0;
+      padding: 36px 0 24px 0;
       position: sticky;
       top: 0;
       background: var(--bg-base);
-      z-index: 10;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 20;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
     }
 
     .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      gap: 16px;
       flex-wrap: wrap;
-      gap: 12px;
     }
 
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    h1 { font-size: 1.2rem; font-weight: 600; }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .brand-info h1 { 
+      font-size: 1.15rem; 
+      font-weight: 600; 
+      letter-spacing: -0.01em;
+    }
+
+    .brand-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
 
     .header-actions {
       display: flex;
@@ -79,14 +130,51 @@
       align-items: center;
     }
 
-    /* Estilo limpio para el bloque de usuario autenticado */
-    .user-profile-group {
+    /* Botones de Estilo Superior */
+    .btn-primary, .btn-secondary, .btn-google {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
+      transition: all var(--transition);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .btn-primary {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: transparent;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-secondary:hover, .btn-google:hover { 
+      background-color: var(--bg-surface-hover); 
+      border-color: var(--border-focus); 
+    }
+
+    .btn-google {
+      background: #ffffff;
+      color: #18181b;
+      border: 1px solid #e4e4e7;
+    }
+    .btn-google:hover { background: #f4f4f5 !important; }
+    .btn-google svg { width: 15px; height: 15px; }
+
+    /* Perfil de Usuario Conectado */
+    .user-profile-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      padding: 4px 10px 4px 4px;
+      padding: 4px 12px 4px 6px;
       border-radius: 50px;
     }
 
@@ -97,158 +185,217 @@
       object-fit: cover;
     }
 
-    .btn-primary, .btn-secondary, .btn-google-small {
-      background-color: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: var(--radius);
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all var(--transition);
-    }
-    .btn-primary:hover, .btn-secondary:hover, .btn-google-small:hover { 
-      background-color: var(--bg-surface); 
-      border-color: var(--border-focus); 
-    }
-    
-    .btn-google-small {
-      background: #ffffff;
-      color: #18181b;
-      border: none;
-      padding: 8px 14px;
-    }
-    .btn-google-small:hover {
-      opacity: 0.9;
-      background: #ffffff;
-    }
-    .btn-google-small svg { width: 14px; height: 14px; }
-
     .btn-logout { 
       color: var(--danger); 
-      border: none; 
-      padding: 4px 8px; 
-      font-size: 0.8rem;
       background: transparent;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 6px;
     }
-    .btn-logout:hover { 
-      background-color: rgba(239, 68, 68, 0.1); 
-      border-radius: var(--radius);
+    .btn-logout:hover { opacity: 0.8; }
+
+    /* --- BARRA DE BÚSQUEDA --- */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 16px;
     }
 
-    .search-container input {
+    .search-wrapper input {
       width: 100%;
       background-color: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 12px 16px;
+      padding: 12px 16px 12px 42px;
       font-size: 0.95rem;
       outline: none;
       border-radius: var(--radius);
-      transition: border-color var(--transition);
+      transition: all var(--transition);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
     }
-    .search-container input:focus { border-color: var(--border-focus); }
+    .search-wrapper input:focus { 
+      border-color: var(--border-focus); 
+      box-shadow: 0 0 0 3px rgba(161, 161, 170, 0.1); 
+    }
 
-    main { width: 100%; padding-bottom: 60px; }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    /* --- GRID DE ENLACES --- */
+    main { width: 100%; }
 
     .links-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 14px;
-      margin-top: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
     }
 
     .link-card {
-      background-color: var(--bg-surface);
+      background-color: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px; 
+      padding: 18px;
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
       position: relative;
       transition: all var(--transition);
+      box-shadow: var(--shadow);
     }
-    .link-card:hover { border-color: var(--border-focus); background-color: var(--bg-hover); transform: translateY(-2px); }
+    .link-card:hover { 
+      border-color: var(--border-focus); 
+      background-color: var(--bg-card-hover); 
+      transform: translateY(-3px); 
+    }
 
-    .link-card-header {
+    .link-card-top {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-      padding-right: 20px;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
-    .link-favicon {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      object-fit: contain;
+    .link-favicon-wrapper {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
 
-    .link-card h3 {
-      font-size: 0.9rem; 
+    .link-favicon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+
+    .link-actions-group {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .link-card:hover .link-actions-group { opacity: 1; }
+
+    .btn-card-action {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      transition: all var(--transition);
+    }
+    .btn-card-action:hover { color: var(--text-main); border-color: var(--border-focus); background: var(--bg-surface-hover); }
+    .btn-delete:hover { color: var(--danger); border-color: rgba(248, 113, 113, 0.4); }
+
+    .link-info h3 {
+      font-size: 0.95rem; 
       font-weight: 500; 
+      margin-bottom: 4px;
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis;
+      color: var(--text-main);
     }
 
-    .link-card p {
-      font-size: 0.75rem; 
+    .link-info p {
+      font-size: 0.78rem; 
       color: var(--text-muted);
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis;
     }
 
-    .btn-delete-card {
-      position: absolute; top: 14px; right: 14px;
-      background: transparent; border: none; color: var(--text-muted);
-      cursor: pointer; font-size: 0.9rem; opacity: 0;
-      transition: opacity var(--transition), color var(--transition);
-    }
-    .link-card:hover .btn-delete-card { opacity: 1; }
-    .btn-delete-card:hover { color: var(--danger); }
-
+    /* --- MODAL PROFESIONAL --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: none; justify-content: center; align-items: center; z-index: 100;
       padding: 20px;
+      animation: fadeIn 0.2s ease;
     }
     .modal-overlay.active { display: flex; }
 
     .modal {
-      background: var(--bg-surface); width: 100%; max-width: 380px;
-      padding: 24px; border-radius: var(--radius); border: 1px solid var(--border);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      background: var(--bg-surface); width: 100%; max-width: 400px;
+      padding: 28px; border-radius: var(--radius); border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
-    .modal h2 { margin-bottom: 16px; font-size: 1rem; font-weight: 500; }
-    .input-group { margin-bottom: 14px; }
+    .modal h2 { margin-bottom: 20px; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+    
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
     .input-group input {
       width: 100%; background: var(--bg-base); border: 1px solid var(--border);
-      color: var(--text-main); padding: 12px; border-radius: var(--radius);
-      font-size: 0.9rem; outline: none;
+      color: var(--text-main); padding: 12px 14px; border-radius: var(--radius-sm);
+      font-size: 0.95rem; outline: none; transition: border-color var(--transition);
     }
     .input-group input:focus { border-color: var(--border-focus); }
 
-    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
-    .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem; font-weight: 500; border: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; border: none; }
     .btn-cancel { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-    .btn-cancel:hover { background: var(--bg-hover); }
+    .btn-cancel:hover { background: var(--bg-surface-hover); }
     .btn-submit { background: var(--text-main); color: var(--bg-base); }
     .btn-submit:hover { opacity: 0.9; }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.9rem; grid-column: 1 / -1; }
+    /* Notificación flotante (Toast) */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-main);
+      color: var(--bg-base);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      grid-column: 1 / -1;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Forzar visibilidad de botones de acción en pantallas táctiles de móviles */
+    @media (max-width: 768px) {
+      .link-actions-group { opacity: 1; }
+    }
   </style>
 
   <!-- Firebase SDKs (Modular v10) -->
@@ -284,10 +431,11 @@
     const searchInput = document.getElementById('searchInput');
     const addModal = document.getElementById('addModal');
     const authContainer = document.getElementById('authContainer');
+    const linkCountBadge = document.getElementById('linkCountBadge');
 
     function loadLocalLinks() {
       try {
-        const stored = localStorage.getItem('min_links');
+        const stored = localStorage.getItem('min_links_pro');
         links = stored ? JSON.parse(stored) : defaultLinks;
       } catch(e) {
         links = defaultLinks;
@@ -296,7 +444,7 @@
 
     function saveLocalLinks() {
       try {
-        localStorage.setItem('min_links', JSON.stringify(links));
+        localStorage.setItem('min_links_pro', JSON.stringify(links));
       } catch(e) {}
     }
 
@@ -319,15 +467,17 @@
         const result = await signInWithPopup(auth, provider);
         currentUser = result.user;
         await fetchCloudLinks(currentUser.uid);
+        showToast("¡Sincronizado con éxito!");
       } catch (error) {
-        console.error("Error al iniciar sesión con popup:", error);
-        alert("No se pudo iniciar sesión con Google. Asegúrate de permitir las ventanas emergentes.");
+        console.error("Error al iniciar sesión:", error);
+        alert("No se pudo iniciar sesión con Google. Permite las ventanas emergentes.");
       }
     };
 
     window.logout = async () => {
       try {
         await signOut(auth);
+        showToast("Sesión cerrada localmente");
       } catch (error) {
         console.error("Error al cerrar sesión:", error);
       }
@@ -360,7 +510,7 @@
         renderLinks(links);
         updateAuthUI();
       } catch (e) {
-        console.error("Error cargando desde la nube:", e);
+        console.error("Error cargando de la nube:", e);
         loadLocalLinks();
         renderLinks(links);
       }
@@ -371,13 +521,13 @@
         authContainer.innerHTML = `
           <div class="user-profile-group">
             <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
-            <button class="btn-logout" onclick="logout()">Salir</button>
+            <button class="btn-logout" onclick="logout()" title="Cerrar sesión">Salir</button>
           </div>
         `;
       } else {
         authContainer.innerHTML = `
-          <button class="btn-google-small" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;">
+          <button class="btn-google" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
               <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
@@ -391,10 +541,13 @@
 
     window.renderLinks = function(linksToRender) {
       linksGrid.innerHTML = '';
+      linkCountBadge.innerText = `${linksToRender.length} ${linksToRender.length === 1 ? 'enlace' : 'enlaces'}`;
+
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces guardados.</div>`;
+        linksGrid.innerHTML = `<div class="empty-state">No se encontraron enlaces guardados.</div>`;
         return;
       }
+
       linksToRender.forEach(link => {
         const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
         let domain = '';
@@ -405,13 +558,21 @@
         card.href = link.url;
         card.target = "_blank";
         card.className = "link-card";
+        
         card.innerHTML = `
-          <div class="link-card-header">
-            <img src="${faviconUrl}" class="link-favicon" onerror="this.style.display='none'">
-            <h3>${link.name}</h3>
+          <div class="link-card-top">
+            <div class="link-favicon-wrapper">
+              <img src="${faviconUrl}" class="link-favicon" onerror="this.style.display='none'">
+            </div>
+            <div class="link-actions-group">
+              <button class="btn-card-action" onclick="copyUrl(event, '${link.url}')" title="Copiar URL">📋</button>
+              <button class="btn-card-action btn-delete" onclick="deleteLink('${link.id}', event)" title="Eliminar">✕</button>
+            </div>
           </div>
-          <p>${displayUrl}</p>
-          <button class="btn-delete-card" onclick="deleteLink('${link.id}', event)" title="Eliminar">✕</button>
+          <div class="link-info">
+            <h3>${link.name}</h3>
+            <p>${displayUrl}</p>
+          </div>
         `;
         linksGrid.appendChild(card);
       });
@@ -431,7 +592,7 @@
           const docRef = await addDoc(collection(db, "links"), newLink);
           links.unshift({ id: docRef.id, ...newLink });
         } catch (e) {
-          alert("No se pudo guardar en la nube.");
+          alert("Error al guardar en la nube.");
           return;
         }
       } else {
@@ -445,17 +606,18 @@
       toggleModal();
       searchInput.value = '';
       renderLinks(links);
+      showToast("Enlace guardado con éxito");
     };
 
     window.deleteLink = async (id, event) => {
       event.preventDefault();
-      if (confirm('¿Deseas eliminar este enlace?')) {
+      if (confirm('¿Deseas eliminar este acceso directo?')) {
         if (currentUser) {
           try {
             await deleteDoc(doc(db, "links", id));
             links = links.filter(link => link.id !== id);
           } catch (e) {
-            alert("No se pudo eliminar.");
+            alert("Error al eliminar.");
             return;
           }
         } else {
@@ -463,7 +625,15 @@
           saveLocalLinks();
         }
         filterLinks();
+        showToast("Enlace eliminado");
       }
+    };
+
+    window.copyUrl = (event, url) => {
+      event.preventDefault();
+      navigator.clipboard.writeText(url).then(() => {
+        showToast("¡Enlace copiado al portapapeles!");
+      });
     };
 
     window.filterLinks = () => {
@@ -483,6 +653,16 @@
       if(e.target === addModal) toggleModal();
     };
 
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Bloqueo total de zoom gestual (Pellizco) en móviles modernos y navegadores
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('touchmove', (event) => {
       if (event.scale && event.scale !== 1) event.preventDefault();
@@ -492,42 +672,54 @@
 <body>
 
   <div id="app-content">
-    <header id="main-header">
+    <header>
       <div class="header-top">
         <div class="header-brand">
-          <h1>Mis Enlaces</h1>
+          <div class="brand-icon">⚡</div>
+          <div class="brand-info">
+            <h1>Mis Enlaces</h1>
+            <span id="linkCountBadge">0 enlaces</span>
+          </div>
         </div>
         <div class="header-actions">
-          <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
+          <button class="btn-primary" onclick="toggleModal()">+ Agregar Enlace</button>
           <div id="authContainer">
-            <!-- Se llena dinámicamente -->
+            <!-- Se carga dinámicamente el estado de Google -->
           </div>
         </div>
       </div>
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar enlaces..." oninput="filterLinks()">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." autocomplete="off" oninput="filterLinks()">
       </div>
     </header>
+
     <main>
       <div class="links-grid" id="linksGrid"></div>
     </main>
   </div>
 
+  <!-- MODAL DE NUEVO ENLACE -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
-      <h2>Nuevo Enlace</h2>
+      <h2>Agregar Nuevo Enlace</h2>
       <div class="input-group">
-        <input type="text" id="linkName" placeholder="Nombre (ej. GitHub)" autocomplete="off">
+        <label>Nombre del sitio</label>
+        <input type="text" id="linkName" placeholder="Ej. GitHub / Documentación" autocomplete="off">
       </div>
       <div class="input-group">
-        <input type="url" id="linkUrl" placeholder="URL (ej. github.com)" autocomplete="off">
+        <label>Dirección URL</label>
+        <input type="url" id="linkUrl" placeholder="Ej. github.com" autocomplete="off">
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
-        <button class="btn-submit" onclick="saveLink()">Guardar</button>
+        <button class="btn-submit" onclick="saveLink()">Guardar Enlace</button>
       </div>
     </div>
   </div>
+
+  <!-- NOTIFICACIÓN TOAST -->
+  <div id="toast"></div>
 
 </body>
 </html>
