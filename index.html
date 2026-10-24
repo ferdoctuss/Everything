@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PocketHub — Cloud & Private Vault</title>
+  <title>PocketHub — Tus Enlaces</title>
+  
+  <!-- Icono / Logo representativo para la app y acceso directo en iPhone / Android -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+
   <style>
     :root {
       --bg-base: #0f1015;
@@ -141,7 +146,6 @@
     }
     .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-    /* Botón Google Login */
     .btn-google {
       background: #ffffff;
       color: #18181b;
@@ -396,6 +400,7 @@
       border-color: rgba(239, 68, 68, 0.2);
     }
 
+    /* Modales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
@@ -410,7 +415,8 @@
       padding: 30px; border-radius: var(--radius); border: 1px solid var(--border);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
-    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; font-weight: 700; }
+    .modal h2 { margin-bottom: 16px; font-size: 1.2rem; font-weight: 700; }
+    .modal p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4; }
     
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
@@ -453,7 +459,7 @@
       text-align: right;
       font-size: 0.78rem;
       color: var(--accent);
-      margin-top: 6px;
+      margin-top: 8px;
       cursor: pointer;
       text-decoration: none;
     }
@@ -524,12 +530,12 @@
     const defaultLinks = [
       { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com", category: "Herramientas", isPrivate: false },
       { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com", category: "Trabajo", isPrivate: false },
-      { id: '3', name: "Notas Confidenciales", url: "https://keep.google.com", category: "Personal", isPrivate: true }
+      { id: '3', name: "Notas Confidenciales", url: "https://keep.google.com", category: "Privado", isPrivate: true }
     ];
 
     function loadLocalLinks() {
       try {
-        const stored = localStorage.getItem('pockethub_links_v3');
+        const stored = localStorage.getItem('pockethub_links_v4');
         links = stored ? JSON.parse(stored) : defaultLinks;
       } catch(e) {
         links = defaultLinks;
@@ -538,7 +544,7 @@
 
     function saveLocalLinks() {
       try {
-        localStorage.setItem('pockethub_links_v3', JSON.stringify(links));
+        localStorage.setItem('pockethub_links_v4', JSON.stringify(links));
       } catch(e) {}
     }
 
@@ -636,37 +642,53 @@
       }
     }
 
-    // --- LÓGICA DE BAÚL PRIVADO Y PIN ---
+    // --- LÓGICA DE BAÚL PRIVADO Y MODAL DE PIN ---
     window.switchVault = function(vaultType) {
       if (vaultType === 'private') {
-        const savedPin = localStorage.getItem('pockethub_pin') || '2027';
-        const pin = prompt("Introduce el PIN de seguridad para acceder al baúl privado:");
-        if (pin === null) return;
-        
-        if (pin !== savedPin) {
-          showToast("PIN incorrecto");
-          return;
-        }
+        document.getElementById('pinModal').classList.add('active');
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+      } else {
+        currentVault = 'public';
+        document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-public').classList.add('active');
+        currentCategoryFilter = 'Todos';
+        filterAndRender();
       }
-      currentVault = vaultType;
-      document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById(`tab-${vaultType}`).classList.add('active');
-      currentCategoryFilter = 'Todos';
-      filterAndRender();
+    }
+
+    window.verifyPin = function() {
+      const enteredPin = document.getElementById('pinInput').value.trim();
+      const savedPin = localStorage.getItem('pockethub_pin') || '2027';
+
+      if (enteredPin === savedPin) {
+        document.getElementById('pinModal').classList.remove('active');
+        currentVault = 'private';
+        document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-private').classList.add('active');
+        currentCategoryFilter = 'Todos';
+        filterAndRender();
+      } else {
+        showToast("PIN incorrecto");
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+      }
+    }
+
+    window.closePinModal = function() {
+      document.getElementById('pinModal').classList.remove('active');
     }
 
     window.forgotPin = function() {
+      closePinModal();
       const confirmationPhrase = "borrar todo y empezar de nuevo";
-      const userInput = prompt(`Para restablecer tu PIN y por seguridad, todos los enlaces privados serán borrados.\n\nEscribe exactamente esta frase:\n"${confirmationPhrase}"`);
+      const userInput = prompt(`⚠️ ATENCIÓN:\nPor seguridad, al recuperar el PIN todos los enlaces privados serán borrados.\n\nEscribe exactamente esta frase para continuar:\n"${confirmationPhrase}"`);
       
       if (userInput === confirmationPhrase) {
         links = links.filter(l => !l.isPrivate);
-        if(currentUser) {
-          // Si usa nube, se recomienda recargar o limpiar (aquí limpiamos local)
-        }
         saveLocalLinks();
         
-        const newPin = prompt("Frase correcta. Ingresa tu nuevo PIN numérico:");
+        const newPin = prompt("¡Frase correcta! Ingresa tu nuevo PIN numérico:");
         if (newPin && newPin.trim().length > 0) {
           localStorage.setItem('pockethub_pin', newPin.trim());
           showToast("¡PIN restablecido con éxito!");
@@ -681,6 +703,12 @@
       } else if (userInput !== null) {
         showToast("La frase no coincide. No se realizaron cambios.");
       }
+    }
+
+    window.togglePrivateCategory = function() {
+      const isPrivate = document.getElementById('linkIsPrivate').checked;
+      const categoryGroup = document.getElementById('categoryGroup');
+      categoryGroup.style.display = isPrivate ? 'none' : 'block';
     }
 
     window.renderCategoriesBar = function() {
@@ -764,8 +792,8 @@
     window.saveLink = async function() {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
-      const categoryInput = document.getElementById('linkCategory').value.trim() || 'General';
       const isPrivateInput = document.getElementById('linkIsPrivate').checked;
+      const categoryInput = isPrivateInput ? 'Privado' : (document.getElementById('linkCategory').value.trim() || 'General');
       const name = nameInput.value.trim();
 
       if (!name || !urlInput) return;
@@ -789,6 +817,7 @@
       nameInput.value = '';
       document.getElementById('linkUrl').value = '';
       document.getElementById('linkIsPrivate').checked = false;
+      document.getElementById('categoryGroup').style.display = 'block';
       toggleModal();
       filterAndRender();
       showToast("¡Enlace guardado con éxito!");
@@ -841,7 +870,10 @@
     <header>
       <div class="header-top">
         <div class="header-brand">
-          <div class="brand-icon">📚</div>
+          <div class="brand-icon">
+            <!-- Logo representativo de Enlace / Cadena -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          </div>
           <div class="brand-info">
             <h1>PocketHub</h1>
             <span id="linkCountBadge">0 enlaces</span>
@@ -872,6 +904,23 @@
     </main>
   </div>
 
+  <!-- MODAL DE INGRESO DE PIN PRIVADO CON OPCIÓN DE RECUPERAR -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal">
+      <h2>Acceso Privado</h2>
+      <p>Introduce tu PIN de seguridad para desbloquear el baúl privado:</p>
+      <div class="input-group">
+        <input type="password" id="pinInput" placeholder="••••" autocomplete="off" maxlength="10" onkeypress="if(event.key === 'Enter') verifyPin()">
+      </div>
+      <a class="pin-link" onclick="forgotPin()">¿Olvidaste tu PIN?</a>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closePinModal()">Cancelar</button>
+        <button class="btn-submit" onclick="verifyPin()">Ingresar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE NUEVO ENLACE -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
       <h2>Guardar Nuevo Enlace</h2>
@@ -883,7 +932,7 @@
         <label>URL de la Web</label>
         <input type="url" id="linkUrl" placeholder="Ej. medium.com/articulo" autocomplete="off">
       </div>
-      <div class="input-group">
+      <div class="input-group" id="categoryGroup">
         <label>Categoría</label>
         <input type="text" id="linkCategory" list="defaultCategories" placeholder="Ej. Lectura, Trabajo..." autocomplete="off">
         <datalist id="defaultCategories">
@@ -895,10 +944,9 @@
       </div>
       <div class="input-group">
         <label class="checkbox-group">
-          <input type="checkbox" id="linkIsPrivate">
+          <input type="checkbox" id="linkIsPrivate" onchange="togglePrivateCategory()">
           <span>Guardar en el Baúl Privado (Protegido con PIN)</span>
         </label>
-        <a class="pin-link" onclick="forgotPin()">¿Olvidaste tu PIN privado?</a>
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
