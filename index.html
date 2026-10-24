@@ -372,13 +372,34 @@
 
     .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); font-size: 0.95rem; grid-column: 1 / -1; background: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Mejoras: cuenta compacta, reloj, calendario y fijados */
+    .account-corner{position:fixed;top:14px;right:18px;z-index:300}
+    .account-trigger{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:40px;padding:5px 9px;cursor:pointer;color:var(--text-main);box-shadow:var(--shadow)}
+    .account-trigger img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+    .account-menu{position:absolute;right:0;top:48px;width:230px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--bg-surface);box-shadow:var(--shadow)}
+    .account-menu[hidden]{display:none}.account-name{font-weight:700;overflow-wrap:anywhere}.account-email{font-size:.75rem;color:var(--text-muted);overflow-wrap:anywhere;margin:5px 0 12px}
+    .account-menu button{width:100%;padding:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-main);border-radius:9px;cursor:pointer}
+    .widgets-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;max-width:760px;margin:24px auto 0}
+    .widget-panel{background:var(--bg-surface);border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+    .widget-label{font-size:.78rem;font-weight:700;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase}
+    .clock-time{font-size:clamp(2rem,5vw,3.3rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.045em;margin:22px 0 8px}
+    .clock-date{color:var(--text-muted);font-size:.9rem;text-transform:capitalize}
+    .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+    .calendar-head strong{text-transform:capitalize;font-size:.95rem}.calendar-head button{border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-main);padding:6px 10px;cursor:pointer}
+    .calendar-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.calendar-days span{font-size:.73rem;color:var(--text-muted);padding:7px 0}
+    .calendar-days button{border:0;background:transparent;color:var(--text-main);aspect-ratio:1;border-radius:9px;cursor:pointer;font-size:.82rem}
+    .calendar-days button:hover{background:var(--bg-card-hover)}.calendar-days button.today{outline:1px solid var(--accent)}.calendar-days button.selected{background:var(--accent);color:white}
+    .pinned-heading{display:flex;align-items:center;justify-content:space-between;margin:4px 0 14px;font-size:1rem}.pinned-heading small{color:var(--text-muted);font-weight:400}
+    .pinned-section{margin-bottom:28px}.pin-action.active{color:var(--accent);background:rgba(99,102,241,.12)}
+    @media(max-width:650px){.widgets-grid{grid-template-columns:1fr}.account-corner{right:10px;top:10px}.account-trigger span{display:none}.widget-panel{padding:18px}}
   </style>
 
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
@@ -399,6 +420,8 @@
     let links = [];
     let currentVault = 'public';
     let currentCategoryFilter = 'Todos';
+    const pinnedKey = 'pockethub_pinned_v1';
+    let pinnedIds = new Set(JSON.parse(localStorage.getItem(pinnedKey) || '[]'));
 
     const defaultLinks = [
       { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com", category: "Herramientas", isPrivate: false },
@@ -480,22 +503,36 @@
     }
 
     function updateAuthUI() {
-      const containerHome = document.getElementById('authContainerHome');
-      
-      const content = currentUser ? `
-        <div class="user-profile-group">
-          <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
-          <button class="btn-logout" onclick="logout()" title="Salir">Salir</button>
-        </div>
-      ` : `
-        <button class="btn-google" onclick="loginWithGoogle()">
-          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-          Iniciar sesión con Google
-        </button>
-      `;
-
-      if(containerHome) containerHome.innerHTML = content;
+      const target = document.getElementById('accountCorner');
+      if (!target) return;
+      target.replaceChildren();
+      if (!currentUser) {
+        const btn = document.createElement('button');
+        btn.className = 'account-trigger'; btn.textContent = 'Iniciar sesión con Google';
+        btn.onclick = window.loginWithGoogle; target.appendChild(btn); return;
+      }
+      const trigger = document.createElement('button'); trigger.className='account-trigger';
+      const avatar = document.createElement('img');
+      avatar.src = currentUser.photoURL || ''; avatar.alt='Cuenta de Google';
+      const label = document.createElement('span'); label.textContent='Mi cuenta ▾';
+      trigger.append(avatar,label);
+      const menu = document.createElement('div'); menu.className='account-menu'; menu.hidden=true;
+      const name = document.createElement('div'); name.className='account-name'; name.textContent=currentUser.displayName || 'Cuenta de Google';
+      const email = document.createElement('div'); email.className='account-email'; email.textContent=currentUser.email || '';
+      const exit = document.createElement('button'); exit.textContent='Cerrar sesión'; exit.onclick=window.logout;
+      menu.append(name,email,exit); target.append(trigger,menu);
+      trigger.onclick=()=>{menu.hidden=!menu.hidden};
     }
+
+    window.togglePin = function(id,event) {
+      event.preventDefault(); event.stopPropagation();
+      const link=links.find(l=>String(l.id)===String(id)); if(!link)return;
+      const key=String(id);
+      if(pinnedIds.has(key)) { pinnedIds.delete(key); showToast('Enlace desfijado'); }
+      else { if(pinnedIds.size>=5){showToast('Solo puedes fijar 5 enlaces');return;} pinnedIds.add(key);showToast('Enlace fijado'); }
+      localStorage.setItem(pinnedKey,JSON.stringify([...pinnedIds]));
+      filterAndRender();
+    };
 
     // --- LÓGICA DE BAÚL PRIVADO ---
     window.switchVault = function(vaultType) {
@@ -591,40 +628,48 @@
     }
 
     function renderLinksGrid(linksToRender) {
-      const linksGrid = document.getElementById('linksGrid');
-      const linkCountBadge = document.getElementById('linkCountBadge');
-      linksGrid.innerHTML = '';
-      linkCountBadge.innerText = `${linksToRender.length} ${linksToRender.length === 1 ? 'enlace' : 'enlaces'}`;
-
-      if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces en este baúl.</div>`;
-        return;
+      const grid=document.getElementById('linksGrid');
+      const main=grid.parentElement;
+      const old=document.getElementById('pinnedLinksSection'); if(old)old.remove();
+      grid.replaceChildren();
+      document.getElementById('linkCountBadge').textContent=`${linksToRender.length} ${linksToRender.length===1?'enlace':'enlaces'}`;
+      const fixed=linksToRender.filter(l=>pinnedIds.has(String(l.id)));
+      const regular=linksToRender.filter(l=>!pinnedIds.has(String(l.id)));
+      if(fixed.length){
+        const section=document.createElement('section');section.id='pinnedLinksSection';section.className='pinned-section';
+        const title=document.createElement('div');title.className='pinned-heading';
+        title.innerHTML='<strong>📌 Enlaces fijados</strong><small>Máximo 5</small>';
+        const pinnedGrid=document.createElement('div');pinnedGrid.className='links-grid';
+        fixed.forEach(l=>pinnedGrid.appendChild(makeLinkCard(l)));
+        section.append(title,pinnedGrid);main.insertBefore(section,grid);
       }
+      if(!regular.length && !fixed.length){grid.innerHTML='<div class="empty-state">No hay enlaces en este baúl.</div>';return;}
+      regular.forEach(l=>grid.appendChild(makeLinkCard(l)));
+    }
 
-      linksToRender.forEach(link => {
-        const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-        let domain = '';
-        try { domain = new URL(link.url).hostname; } catch(e) { domain = displayUrl.split('/')[0]; }
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-
-        const card = document.createElement('a');
-        card.href = link.url; card.target = "_blank"; card.className = "link-card";
-        card.innerHTML = `
-          <div class="link-card-header">
-            <div class="link-favicon-large"><img src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/><line x1=%2212%22 y1=%228%22 x2=%2212%22 y2=%2212%22/><line x1=%2212%22 y1=%2216%22 x2=%2212.01%22 y2=%2216%22/></svg>'"></div>
-            <div class="link-actions-group">
-              <button class="btn-card-action" onclick="copyUrl(event, '${link.url}')" title="Copiar URL">📋</button>
-              <button class="btn-card-action btn-delete" onclick="deleteLink('${link.id}', event)" title="Eliminar">✕</button>
-            </div>
-          </div>
-          <div class="link-info"><h3>${link.name}</h3><p>${displayUrl}</p></div>
-          <div class="link-card-footer">
-            <span class="link-category-badge">${link.category || 'General'}</span>
-            ${link.isPrivate ? '<span class="link-category-badge private-tag">Privado</span>' : ''}
-          </div>
-        `;
-        linksGrid.appendChild(card);
-      });
+    function makeLinkCard(link){
+      const card=document.createElement('a');card.className='link-card';
+      const safeUrl=/^https?:\/\//i.test(link.url)?link.url:'#';
+      card.href=safeUrl;card.target='_blank';card.rel='noopener noreferrer';
+      const header=document.createElement('div');header.className='link-card-header';
+      const favicon=document.createElement('div');favicon.className='link-favicon-large';
+      const img=document.createElement('img');
+      try{img.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(new URL(safeUrl).hostname)+'&sz=128'}catch(e){}
+      img.alt='';favicon.appendChild(img);
+      const actions=document.createElement('div');actions.className='link-actions-group';
+      const pin=document.createElement('button');pin.className='btn-card-action pin-action'+(pinnedIds.has(String(link.id))?' active':'');
+      pin.textContent=pinnedIds.has(String(link.id))?'📌':'📍';pin.title=pinnedIds.has(String(link.id))?'Desfijar':'Fijar enlace';
+      pin.onclick=e=>window.togglePin(link.id,e);
+      const copy=document.createElement('button');copy.className='btn-card-action';copy.textContent='📋';copy.title='Copiar URL';copy.onclick=e=>window.copyUrl(e,link.url);
+      const del=document.createElement('button');del.className='btn-card-action btn-delete';del.textContent='✕';del.title='Eliminar';del.onclick=e=>window.deleteLink(link.id,e);
+      actions.append(pin,copy,del);header.append(favicon,actions);
+      const info=document.createElement('div');info.className='link-info';
+      const name=document.createElement('h3');name.textContent=link.name;
+      const url=document.createElement('p');url.textContent=link.url.replace(/^https?:\/\//,'').replace(/\/$/,'');info.append(name,url);
+      const footer=document.createElement('div');footer.className='link-card-footer';
+      const category=document.createElement('span');category.className='link-category-badge';category.textContent=link.category||'General';footer.append(category);
+      if(link.isPrivate){const privateTag=document.createElement('span');privateTag.className='link-category-badge private-tag';privateTag.textContent='Privado';footer.append(privateTag)}
+      card.append(header,info,footer);return card;
     }
 
     window.saveLink = async function() {
@@ -664,6 +709,7 @@
           try { await deleteDoc(doc(db, "links", id)); } catch(e) {}
         }
         links = links.filter(link => link.id !== id);
+        pinnedIds.delete(String(id)); localStorage.setItem(pinnedKey,JSON.stringify([...pinnedIds]));
         saveLocalLinks(); filterAndRender();
         showToast("Enlace eliminado");
       }
@@ -736,7 +782,8 @@
     }
   </script>
 </head>
-<body onload="loadLocalLinks(); filterAndRender(); updateAuthUI();">
+<body onload="loadLocalLinks(); filterAndRender(); updateAuthUI(); initDashboard();">
+  <div class="account-corner" id="accountCorner"></div>
 
   <!-- ================= VISTA 1: HOME (PÁGINA PRINCIPAL) ================= -->
   <section class="view-section active" id="view-home">
@@ -758,9 +805,11 @@
         </div>
       </div>
 
-      <div style="margin-top: 35px; border-top: 1px solid var(--border); padding-top: 25px; display: flex; justify-content: center;">
-        <div id="authContainerHome"></div>
-      </div>
+
+    </div>
+    <div class="widgets-grid">
+      <div class="widget-panel"><div class="widget-label">Hora actual</div><div id="clockTime" class="clock-time">--:--:--</div><div id="clockDate" class="clock-date"></div></div>
+      <div class="widget-panel"><div class="calendar-head"><button onclick="moveCalendar(-1)" aria-label="Mes anterior">‹</button><strong id="calendarTitle"></strong><button onclick="moveCalendar(1)" aria-label="Mes siguiente">›</button></div><div id="calendarDays" class="calendar-days"></div></div>
     </div>
   </section>
 
@@ -888,5 +937,28 @@
 
   <div id="toast"></div>
 
+
+<script>
+  let calendarCursor=new Date();let calendarSelected=new Date();
+  function updateClock(){const now=new Date();const t=document.getElementById('clockTime');if(!t)return;
+    t.textContent=now.toLocaleTimeString('es-PE',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('clockDate').textContent=now.toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }
+  function moveCalendar(delta){calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);renderCalendar()}
+  function renderCalendar(){const y=calendarCursor.getFullYear(),m=calendarCursor.getMonth();
+    document.getElementById('calendarTitle').textContent=calendarCursor.toLocaleDateString('es-PE',{month:'long',year:'numeric'});
+    const box=document.getElementById('calendarDays');box.replaceChildren();
+    ['L','M','M','J','V','S','D'].forEach(x=>{const s=document.createElement('span');s.textContent=x;box.appendChild(s)});
+    const start=(new Date(y,m,1).getDay()+6)%7;
+    for(let i=0;i<start;i++)box.appendChild(document.createElement('span'));
+    const today=new Date();const count=new Date(y,m+1,0).getDate();
+    for(let d=1;d<=count;d++){const b=document.createElement('button');b.textContent=d;
+      if(y===today.getFullYear()&&m===today.getMonth()&&d===today.getDate())b.classList.add('today');
+      if(y===calendarSelected.getFullYear()&&m===calendarSelected.getMonth()&&d===calendarSelected.getDate())b.classList.add('selected');
+      b.onclick=()=>{calendarSelected=new Date(y,m,d);renderCalendar()};box.appendChild(b)}
+  }
+  function initDashboard(){updateClock();renderCalendar();setInterval(updateClock,1000)}
+  document.addEventListener('click',e=>{const corner=document.getElementById('accountCorner');if(corner&&!corner.contains(e.target)){const menu=corner.querySelector('.account-menu');if(menu)menu.hidden=true}});
+</script>
 </body>
 </html>
