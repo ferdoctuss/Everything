@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PocketHub — Tus Enlaces con Estilo</title>
+  <title>PocketHub — Cloud & Private Vault</title>
   <style>
     :root {
       --bg-base: #0f1015;
@@ -67,7 +67,6 @@
       animation: fadeIn 0.3s ease;
     }
 
-    /* --- CABECERA ESTILO POCKET --- */
     header {
       width: 100%;
       padding: 30px 0 20px 0;
@@ -122,6 +121,7 @@
       display: flex;
       gap: 10px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .btn-primary {
@@ -141,10 +141,53 @@
     }
     .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-    /* Navegación de Baúles (Públicos / Privados) */
+    /* Botón Google Login */
+    .btn-google {
+      background: #ffffff;
+      color: #18181b;
+      border: 1px solid #e4e4e7;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    .btn-google:hover { background: #f4f4f5; }
+    .btn-google svg { width: 16px; height: 16px; }
+
+    .user-profile-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 4px 12px 4px 6px;
+      border-radius: 50px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .btn-logout { 
+      color: var(--danger); 
+      background: transparent;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     .vault-tabs {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       background: var(--bg-surface);
       padding: 4px;
       border-radius: var(--radius-sm);
@@ -168,7 +211,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    /* Controles y Búsqueda */
     .controls-container {
       display: flex;
       flex-direction: column;
@@ -232,7 +274,6 @@
       border-color: transparent;
     }
 
-    /* --- GRID DE TARJETAS TIPO POCKET (LOGOS GRANDES) --- */
     main { width: 100%; margin-top: 10px; }
 
     .links-grid {
@@ -268,7 +309,6 @@
       margin-bottom: 16px;
     }
 
-    /* Logo / Favicon Grande Protagonista */
     .link-favicon-large {
       width: 52px;
       height: 52px;
@@ -356,7 +396,6 @@
       border-color: rgba(239, 68, 68, 0.2);
     }
 
-    /* --- MODAL --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
@@ -382,7 +421,6 @@
     }
     .input-group input:focus { border-color: var(--border-focus); }
 
-    /* Checkbox personalizado para Privado */
     .checkbox-group {
       display: flex;
       align-items: center;
@@ -410,7 +448,17 @@
     .btn-submit { background: var(--accent); color: #fff; }
     .btn-submit:hover { background: var(--accent-hover); }
 
-    /* Toast */
+    .pin-link {
+      display: block;
+      text-align: right;
+      font-size: 0.78rem;
+      color: var(--accent);
+      margin-top: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .pin-link:hover { text-decoration: underline; }
+
     #toast {
       position: fixed;
       bottom: 24px;
@@ -447,9 +495,30 @@
     }
   </style>
 
-  <script>
+  <!-- Firebase SDKs (Modular v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
+      authDomain: "el-baul-de-fernando.firebaseapp.com",
+      projectId: "el-baul-de-fernando",
+      storageBucket: "el-baul-de-fernando.firebasestorage.app",
+      messagingSenderId: "648436947805",
+      appId: "1:648436947805:web:d38987be3123ce78f766b4",
+      measurementId: "G-X7RXQ53VSG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
     let links = [];
-    let currentVault = 'public'; // 'public' o 'private'
+    let currentVault = 'public';
     let currentCategoryFilter = 'Todos';
 
     const defaultLinks = [
@@ -458,26 +527,123 @@
       { id: '3', name: "Notas Confidenciales", url: "https://keep.google.com", category: "Personal", isPrivate: true }
     ];
 
-    function initApp() {
+    function loadLocalLinks() {
       try {
-        const stored = localStorage.getItem('pockethub_links');
+        const stored = localStorage.getItem('pockethub_links_v3');
         links = stored ? JSON.parse(stored) : defaultLinks;
       } catch(e) {
         links = defaultLinks;
       }
-      filterAndRender();
     }
 
-    function saveLinks() {
+    function saveLocalLinks() {
       try {
-        localStorage.setItem('pockethub_links', JSON.stringify(links));
+        localStorage.setItem('pockethub_links_v3', JSON.stringify(links));
       } catch(e) {}
     }
 
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        await fetchCloudLinks(user.uid);
+      } else {
+        currentUser = null;
+        loadLocalLinks();
+        filterAndRender();
+        updateAuthUI();
+      }
+    });
+
+    window.loginWithGoogle = async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        currentUser = result.user;
+        await fetchCloudLinks(currentUser.uid);
+        showToast("¡Sincronizado con Google!");
+      } catch (error) {
+        console.error("Error en login:", error);
+        alert("No se pudo iniciar sesión con Google. Permite las ventanas emergentes.");
+      }
+    };
+
+    window.logout = async () => {
+      try {
+        await signOut(auth);
+        showToast("Sesión cerrada");
+      } catch (error) {
+        console.error("Error al salir:", error);
+      }
+    };
+
+    async function fetchCloudLinks(uid) {
+      try {
+        const q = query(collection(db, "links"), where("uid", "==", uid));
+        const querySnapshot = await getDocs(q);
+        let cloudLinks = [];
+        querySnapshot.forEach((docSnap) => {
+          cloudLinks.push({ id: docSnap.id, category: 'General', isPrivate: false, ...docSnap.data() });
+        });
+        
+        if (cloudLinks.length === 0) {
+          loadLocalLinks();
+          for (const l of links) {
+            await addDoc(collection(db, "links"), {
+              uid: uid,
+              name: l.name,
+              url: l.url,
+              category: l.category || 'General',
+              isPrivate: l.isPrivate || false,
+              createdAt: Date.now()
+            });
+          }
+          await fetchCloudLinks(uid);
+          return;
+        }
+
+        links = cloudLinks;
+        filterAndRender();
+        updateAuthUI();
+      } catch (e) {
+        console.error("Error nube:", e);
+        loadLocalLinks();
+        filterAndRender();
+      }
+    }
+
+    function updateAuthUI() {
+      const authContainer = document.getElementById('authContainer');
+      if (currentUser) {
+        authContainer.innerHTML = `
+          <div class="user-profile-group">
+            <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
+            <button class="btn-logout" onclick="logout()" title="Salir">Salir</button>
+          </div>
+        `;
+      } else {
+        authContainer.innerHTML = `
+          <button class="btn-google" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Sincronizar
+          </button>
+        `;
+      }
+    }
+
+    // --- LÓGICA DE BAÚL PRIVADO Y PIN ---
     window.switchVault = function(vaultType) {
       if (vaultType === 'private') {
-        const pin = prompt("Introduce el PIN de seguridad para acceder al baúl privado (PIN por defecto: 2027):");
-        if (pin !== "2027") {
+        const savedPin = localStorage.getItem('pockethub_pin') || '2027';
+        const pin = prompt("Introduce el PIN de seguridad para acceder al baúl privado:");
+        if (pin === null) return;
+        
+        if (pin !== savedPin) {
           showToast("PIN incorrecto");
           return;
         }
@@ -487,6 +653,34 @@
       document.getElementById(`tab-${vaultType}`).classList.add('active');
       currentCategoryFilter = 'Todos';
       filterAndRender();
+    }
+
+    window.forgotPin = function() {
+      const confirmationPhrase = "borrar todo y empezar de nuevo";
+      const userInput = prompt(`Para restablecer tu PIN y por seguridad, todos los enlaces privados serán borrados.\n\nEscribe exactamente esta frase:\n"${confirmationPhrase}"`);
+      
+      if (userInput === confirmationPhrase) {
+        links = links.filter(l => !l.isPrivate);
+        if(currentUser) {
+          // Si usa nube, se recomienda recargar o limpiar (aquí limpiamos local)
+        }
+        saveLocalLinks();
+        
+        const newPin = prompt("Frase correcta. Ingresa tu nuevo PIN numérico:");
+        if (newPin && newPin.trim().length > 0) {
+          localStorage.setItem('pockethub_pin', newPin.trim());
+          showToast("¡PIN restablecido con éxito!");
+          currentVault = 'public';
+          document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
+          document.getElementById('tab-public').classList.add('active');
+          filterAndRender();
+        } else {
+          localStorage.setItem('pockethub_pin', '2027');
+          showToast("PIN restablecido a valor por defecto (2027)");
+        }
+      } else if (userInput !== null) {
+        showToast("La frase no coincide. No se realizaron cambios.");
+      }
     }
 
     window.renderCategoriesBar = function() {
@@ -511,7 +705,6 @@
     window.filterAndRender = function() {
       renderCategoriesBar();
       const queryText = document.getElementById('searchInput').value.toLowerCase();
-      
       const vaultLinks = links.filter(l => currentVault === 'private' ? l.isPrivate : !l.isPrivate);
       
       const filtered = vaultLinks.filter(link => {
@@ -538,7 +731,7 @@
         const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
         let domain = '';
         try { domain = new URL(link.url).hostname; } catch(e) { domain = displayUrl.split('/')[0]; }
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`; // Tamaño grande y nítido estilo Pocket
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
         const card = document.createElement('a');
         card.href = link.url;
@@ -568,7 +761,7 @@
       });
     }
 
-    window.saveLink = function() {
+    window.saveLink = async function() {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
       const categoryInput = document.getElementById('linkCategory').value.trim() || 'General';
@@ -578,16 +771,20 @@
       if (!name || !urlInput) return;
       if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-      const newLink = { 
-        id: Date.now().toString(), 
-        name: name, 
-        url: urlInput, 
-        category: categoryInput, 
-        isPrivate: isPrivateInput 
-      };
-      
-      links.unshift(newLink);
-      saveLinks();
+      if (currentUser && !isPrivateInput) {
+        try {
+          const newLink = { uid: currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: false, createdAt: Date.now() };
+          const docRef = await addDoc(collection(db, "links"), newLink);
+          links.unshift({ id: docRef.id, ...newLink });
+        } catch (e) {
+          alert("Error al guardar en la nube.");
+          return;
+        }
+      } else {
+        const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput };
+        links.unshift(newLink);
+        saveLocalLinks();
+      }
 
       nameInput.value = '';
       document.getElementById('linkUrl').value = '';
@@ -597,11 +794,17 @@
       showToast("¡Enlace guardado con éxito!");
     };
 
-    window.deleteLink = function(id, event) {
+    window.deleteLink = async function(id, event) {
       event.preventDefault();
       if (confirm('¿Deseas eliminar este enlace?')) {
+        const linkToDelete = links.find(l => l.id === id);
+        if (currentUser && linkToDelete && !linkToDelete.isPrivate) {
+          try {
+            await deleteDoc(doc(db, "links", id));
+          } catch(e) {}
+        }
         links = links.filter(link => link.id !== id);
-        saveLinks();
+        saveLocalLinks();
         filterAndRender();
         showToast("Enlace eliminado");
       }
@@ -632,7 +835,7 @@
     }
   </script>
 </head>
-<body onload="initApp()">
+<body onload="loadLocalLinks(); filterAndRender();">
 
   <div id="app-content">
     <header>
@@ -646,12 +849,12 @@
         </div>
 
         <div class="header-actions">
-          <!-- Selector de Baúles (Público / Privado) -->
           <div class="vault-tabs">
             <button class="vault-tab active" id="tab-public" onclick="switchVault('public')">Públicos</button>
             <button class="vault-tab" id="tab-private" onclick="switchVault('private')">🔒 Privados</button>
           </div>
           <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
+          <div id="authContainer"></div>
         </div>
       </div>
 
@@ -669,7 +872,6 @@
     </main>
   </div>
 
-  <!-- MODAL DE NUEVO ENLACE CON OPCIÓN PRIVADA -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
       <h2>Guardar Nuevo Enlace</h2>
@@ -694,8 +896,9 @@
       <div class="input-group">
         <label class="checkbox-group">
           <input type="checkbox" id="linkIsPrivate">
-          <span>Guardar en el Baúl Privado (Protegido)</span>
+          <span>Guardar en el Baúl Privado (Protegido con PIN)</span>
         </label>
+        <a class="pin-link" onclick="forgotPin()">¿Olvidaste tu PIN privado?</a>
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
