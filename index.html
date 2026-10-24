@@ -3,38 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mis Enlaces — Hub Profesional</title>
+  <title>PocketHub — Tus Enlaces con Estilo</title>
   <style>
     :root {
-      --bg-base: #09090b;
-      --bg-surface: #121215;
-      --bg-surface-hover: #18181b;
-      --bg-card: #121215;
-      --bg-card-hover: #18181b;
-      --border: #27272a;
-      --border-focus: #52525b;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #f4f4f5;
-      --accent-hover: #ffffff;
-      --danger: #f87171;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      --bg-base: #0f1015;
+      --bg-surface: #181920;
+      --bg-card: #1f2029;
+      --bg-card-hover: #262833;
+      --border: #2d2f3d;
+      --border-focus: #6366f1;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --danger: #ef4444;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg-base: #fafafa;
+        --bg-base: #f8fafc;
         --bg-surface: #ffffff;
-        --bg-surface-hover: #f4f4f5;
         --bg-card: #ffffff;
-        --bg-card-hover: #fcfcfc;
-        --border: #e4e4e7;
-        --border-focus: #a1a1aa;
-        --text-main: #09090b;
-        --text-muted: #71717a;
+        --bg-card-hover: #f1f5f9;
+        --border: #e2e8f0;
+        --border-focus: #6366f1;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
         --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       }
     }
@@ -56,30 +54,30 @@
       align-items: center;
       touch-action: manipulation;
       overflow-x: hidden;
-      padding-bottom: 40px;
+      padding-bottom: 50px;
     }
 
     #app-content {
       width: 100%;
-      max-width: 1000px;
-      padding: 0 24px;
+      max-width: 1100px;
+      padding: 0 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       animation: fadeIn 0.3s ease;
     }
 
+    /* --- CABECERA ESTILO POCKET --- */
     header {
       width: 100%;
-      padding: 36px 0 20px 0;
+      padding: 30px 0 20px 0;
       position: sticky;
       top: 0;
       background: var(--bg-base);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       z-index: 20;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .header-top {
@@ -97,25 +95,26 @@
     }
 
     .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
     .brand-info h1 { 
-      font-size: 1.15rem; 
-      font-weight: 600; 
-      letter-spacing: -0.01em;
+      font-size: 1.3rem; 
+      font-weight: 700; 
+      letter-spacing: -0.02em;
     }
 
     .brand-info span {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
@@ -125,74 +124,56 @@
       align-items: center;
     }
 
-    .btn-primary, .btn-secondary, .btn-google {
-      background: var(--bg-surface);
-      color: var(--text-main);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
       border-radius: var(--radius-sm);
-      font-weight: 500;
-      font-size: 0.85rem;
+      font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all var(--transition);
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-    .btn-primary {
-      background: var(--text-main);
-      color: var(--bg-base);
-      border-color: transparent;
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    .btn-secondary:hover, .btn-google:hover { 
-      background-color: var(--bg-surface-hover); 
-      border-color: var(--border-focus); 
-    }
-
-    .btn-google {
-      background: #ffffff;
-      color: #18181b;
-      border: 1px solid #e4e4e7;
-    }
-    .btn-google:hover { background: #f4f4f5 !important; }
-    .btn-google svg { width: 15px; height: 15px; }
-
-    .user-profile-group {
+    /* Navegación de Baúles (Públicos / Privados) */
+    .vault-tabs {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      gap: 8px;
       background: var(--bg-surface);
+      padding: 4px;
+      border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      padding: 4px 12px 4px 6px;
-      border-radius: 50px;
     }
 
-    .user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .btn-logout { 
-      color: var(--danger); 
+    .vault-tab {
       background: transparent;
       border: none;
-      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
-      padding: 4px 6px;
+      transition: var(--transition);
     }
-    .btn-logout:hover { opacity: 0.8; }
+    .vault-tab.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
+    /* Controles y Búsqueda */
     .controls-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 16px;
+      gap: 14px;
+      margin-top: 18px;
       width: 100%;
     }
 
@@ -206,22 +187,21 @@
       background-color: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 12px 16px 12px 42px;
+      padding: 12px 16px 12px 44px;
       font-size: 0.95rem;
       outline: none;
       border-radius: var(--radius);
-      transition: all var(--transition);
+      transition: var(--transition);
     }
-    .search-wrapper input:focus { border-color: var(--border-focus); }
+    .search-wrapper input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
 
     .search-icon {
       position: absolute;
-      left: 14px;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
-      font-size: 0.95rem;
-      pointer-events: none;
+      font-size: 1rem;
     }
 
     .categories-bar {
@@ -237,13 +217,13 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 6px 14px;
+      padding: 6px 16px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
-      transition: all var(--transition);
+      transition: var(--transition);
     }
     .category-chip:hover { border-color: var(--border-focus); color: var(--text-main); }
     .category-chip.active {
@@ -252,63 +232,67 @@
       border-color: transparent;
     }
 
+    /* --- GRID DE TARJETAS TIPO POCKET (LOGOS GRANDES) --- */
     main { width: 100%; margin-top: 10px; }
 
     .links-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
     }
 
     .link-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 18px;
+      padding: 20px;
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: all var(--transition);
+      transition: var(--transition);
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
     .link-card:hover { 
       border-color: var(--border-focus); 
       background-color: var(--bg-card-hover); 
-      transform: translateY(-3px); 
+      transform: translateY(-4px); 
     }
 
-    .link-card-top {
+    .link-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
-    .link-favicon-wrapper {
-      width: 32px;
-      height: 32px;
+    /* Logo / Favicon Grande Protagonista */
+    .link-favicon-large {
+      width: 52px;
+      height: 52px;
       background: var(--bg-base);
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .link-favicon {
-      width: 16px;
-      height: 16px;
+    .link-favicon-large img {
+      width: 28px;
+      height: 28px;
       object-fit: contain;
     }
 
     .link-actions-group {
       display: flex;
-      gap: 4px;
+      gap: 6px;
       opacity: 0;
-      transition: opacity var(--transition);
+      transition: var(--transition);
     }
     .link-card:hover .link-actions-group { opacity: 1; }
 
@@ -316,23 +300,23 @@
       background: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
-      transition: all var(--transition);
+      font-size: 0.85rem;
+      transition: var(--transition);
     }
-    .btn-card-action:hover { color: var(--text-main); border-color: var(--border-focus); background: var(--bg-surface-hover); }
-    .btn-delete:hover { color: var(--danger); border-color: rgba(248, 113, 113, 0.4); }
+    .btn-card-action:hover { color: var(--text-main); border-color: var(--border-focus); background: var(--bg-card); }
+    .btn-delete:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.4); }
 
     .link-info h3 {
-      font-size: 0.95rem; 
-      font-weight: 500; 
-      margin-bottom: 4px;
+      font-size: 1.05rem; 
+      font-weight: 600; 
+      margin-bottom: 6px;
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis;
@@ -340,29 +324,42 @@
     }
 
     .link-info p {
-      font-size: 0.78rem; 
+      font-size: 0.82rem; 
       color: var(--text-muted);
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .link-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
     }
 
     .link-category-badge {
       display: inline-block;
       background: var(--bg-base);
       border: 1px solid var(--border);
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 6px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       font-weight: 500;
-      align-self: flex-start;
     }
 
+    .private-tag {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* --- MODAL --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
       display: none; justify-content: center; align-items: center; z-index: 100;
       padding: 20px;
       animation: fadeIn 0.2s ease;
@@ -370,28 +367,50 @@
     .modal-overlay.active { display: flex; }
 
     .modal {
-      background: var(--bg-surface); width: 100%; max-width: 400px;
-      padding: 28px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--bg-surface); width: 100%; max-width: 420px;
+      padding: 30px; border-radius: var(--radius); border: 1px solid var(--border);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
-    .modal h2 { margin-bottom: 20px; font-size: 1.1rem; font-weight: 600; }
+    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; font-weight: 700; }
     
     .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
-    .input-group input, .input-group select {
+    .input-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .input-group input {
       width: 100%; background: var(--bg-base); border: 1px solid var(--border);
       color: var(--text-main); padding: 12px 14px; border-radius: var(--radius-sm);
-      font-size: 0.95rem; outline: none; transition: border-color var(--transition);
+      font-size: 0.95rem; outline: none; transition: var(--transition);
     }
-    .input-group input:focus, .input-group select:focus { border-color: var(--border-focus); }
+    .input-group input:focus { border-color: var(--border-focus); }
+
+    /* Checkbox personalizado para Privado */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-group input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .checkbox-group span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; border: none; }
+    .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 600; border: none; }
     .btn-cancel { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-    .btn-cancel:hover { background: var(--bg-surface-hover); }
-    .btn-submit { background: var(--text-main); color: var(--bg-base); }
-    .btn-submit:hover { opacity: 0.9; }
+    .btn-cancel:hover { background: var(--bg-card); }
+    .btn-submit { background: var(--accent); color: #fff; }
+    .btn-submit:hover { background: var(--accent-hover); }
 
+    /* Toast */
     #toast {
       position: fixed;
       bottom: 24px;
@@ -399,11 +418,11 @@
       transform: translateX(-50%) translateY(100px);
       background: var(--text-main);
       color: var(--bg-base);
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 1000;
       pointer-events: none;
@@ -414,7 +433,7 @@
       text-align: center;
       padding: 80px 20px;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       grid-column: 1 / -1;
       background: var(--bg-surface);
       border: 1px dashed var(--border);
@@ -428,157 +447,52 @@
     }
   </style>
 
-  <!-- Firebase SDKs (Modular v10) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
-      authDomain: "el-baul-de-fernando.firebaseapp.com",
-      projectId: "el-baul-de-fernando",
-      storageBucket: "el-baul-de-fernando.firebasestorage.app",
-      messagingSenderId: "648436947805",
-      appId: "1:648436947805:web:d38987be3123ce78f766b4",
-      measurementId: "G-X7RXQ53VSG"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    let currentUser = null;
+  <script>
     let links = [];
+    let currentVault = 'public'; // 'public' o 'private'
     let currentCategoryFilter = 'Todos';
 
     const defaultLinks = [
-      { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com", category: "Herramientas" },
-      { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com", category: "Trabajo" }
+      { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com", category: "Herramientas", isPrivate: false },
+      { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com", category: "Trabajo", isPrivate: false },
+      { id: '3', name: "Notas Confidenciales", url: "https://keep.google.com", category: "Personal", isPrivate: true }
     ];
 
-    const linksGrid = document.getElementById('linksGrid');
-    const searchInput = document.getElementById('searchInput');
-    const addModal = document.getElementById('addModal');
-    const authContainer = document.getElementById('authContainer');
-    const linkCountBadge = document.getElementById('linkCountBadge');
-    const categoriesBar = document.getElementById('categoriesBar');
-
-    function loadLocalLinks() {
+    function initApp() {
       try {
-        const stored = localStorage.getItem('min_links_categories');
+        const stored = localStorage.getItem('pockethub_links');
         links = stored ? JSON.parse(stored) : defaultLinks;
       } catch(e) {
         links = defaultLinks;
       }
+      filterAndRender();
     }
 
-    function saveLocalLinks() {
+    function saveLinks() {
       try {
-        localStorage.setItem('min_links_categories', JSON.stringify(links));
+        localStorage.setItem('pockethub_links', JSON.stringify(links));
       } catch(e) {}
     }
 
-    // Configurar persistencia local y manejar resultado de redirección segura para móviles
-    setPersistence(auth, browserLocalPersistence)
-      .then(() => {
-        return getRedirectResult(auth);
-      })
-      .catch((error) => {
-        console.error("Error en auth:", error);
-      });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        await fetchCloudLinks(user.uid);
-      } else {
-        currentUser = null;
-        loadLocalLinks();
-        filterAndRender();
-        updateAuthUI();
-      }
-    });
-
-    // Usar Redirección en lugar de Popup para compatibilidad total con móviles y navegadores privados
-    window.loginWithGoogle = async () => {
-      try {
-        await signInWithRedirect(auth, provider);
-      } catch (error) {
-        console.error("Error al iniciar sesión con redirección:", error);
-        alert("No se pudo iniciar sesión con Google.");
-      }
-    };
-
-    window.logout = async () => {
-      try {
-        await signOut(auth);
-        showToast("Sesión cerrada localmente");
-      } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-      }
-    };
-
-    async function fetchCloudLinks(uid) {
-      try {
-        const q = query(collection(db, "links"), where("uid", "==", uid));
-        const querySnapshot = await getDocs(q);
-        let cloudLinks = [];
-        querySnapshot.forEach((docSnap) => {
-          cloudLinks.push({ id: docSnap.id, category: 'General', ...docSnap.data() });
-        });
-        
-        if (cloudLinks.length === 0) {
-          loadLocalLinks();
-          for (const l of links) {
-            await addDoc(collection(db, "links"), {
-              uid: uid,
-              name: l.name,
-              url: l.url,
-              category: l.category || 'General',
-              createdAt: Date.now()
-            });
-          }
-          await fetchCloudLinks(uid);
+    window.switchVault = function(vaultType) {
+      if (vaultType === 'private') {
+        const pin = prompt("Introduce el PIN de seguridad para acceder al baúl privado (PIN por defecto: 2027):");
+        if (pin !== "2027") {
+          showToast("PIN incorrecto");
           return;
         }
-
-        links = cloudLinks;
-        filterAndRender();
-        updateAuthUI();
-      } catch (e) {
-        console.error("Error cargando de la nube:", e);
-        loadLocalLinks();
-        filterAndRender();
       }
+      currentVault = vaultType;
+      document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${vaultType}`).classList.add('active');
+      currentCategoryFilter = 'Todos';
+      filterAndRender();
     }
 
-    function updateAuthUI() {
-      if (currentUser) {
-        authContainer.innerHTML = `
-          <div class="user-profile-group">
-            <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
-            <button class="btn-logout" onclick="logout()" title="Cerrar sesión">Salir</button>
-          </div>
-        `;
-      } else {
-        authContainer.innerHTML = `
-          <button class="btn-google" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
-            </svg>
-            Sincronizar
-          </button>
-        `;
-      }
-    }
-
-    function renderCategoriesBar() {
-      const categories = ['Todos', ...new Set(links.map(l => l.category || 'General'))];
+    window.renderCategoriesBar = function() {
+      const vaultLinks = links.filter(l => currentVault === 'private' ? l.isPrivate : !l.isPrivate);
+      const categories = ['Todos', ...new Set(vaultLinks.map(l => l.category || 'General'))];
+      const categoriesBar = document.getElementById('categoriesBar');
       categoriesBar.innerHTML = '';
 
       categories.forEach(cat => {
@@ -596,9 +510,11 @@
 
     window.filterAndRender = function() {
       renderCategoriesBar();
-      const queryText = searchInput.value.toLowerCase();
+      const queryText = document.getElementById('searchInput').value.toLowerCase();
       
-      const filtered = links.filter(link => {
+      const vaultLinks = links.filter(l => currentVault === 'private' ? l.isPrivate : !l.isPrivate);
+      
+      const filtered = vaultLinks.filter(link => {
         const matchesQuery = link.name.toLowerCase().includes(queryText) || link.url.toLowerCase().includes(queryText);
         const matchesCategory = currentCategoryFilter === 'Todos' || (link.category || 'General') === currentCategoryFilter;
         return matchesQuery && matchesCategory;
@@ -608,11 +524,13 @@
     }
 
     function renderLinksGrid(linksToRender) {
+      const linksGrid = document.getElementById('linksGrid');
+      const linkCountBadge = document.getElementById('linkCountBadge');
       linksGrid.innerHTML = '';
-      linkCountBadge.innerText = `${links.length} ${links.length === 1 ? 'enlace' : 'enlaces'}`;
+      linkCountBadge.innerText = `${linksToRender.length} ${linksToRender.length === 1 ? 'enlace' : 'enlaces'}`;
 
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No se encontraron enlaces en esta categoría.</div>`;
+        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces en este baúl. ¡Agrega uno nuevo!</div>`;
         return;
       }
 
@@ -620,7 +538,7 @@
         const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
         let domain = '';
         try { domain = new URL(link.url).hostname; } catch(e) { domain = displayUrl.split('/')[0]; }
-        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`; // Tamaño grande y nítido estilo Pocket
 
         const card = document.createElement('a');
         card.href = link.url;
@@ -628,9 +546,9 @@
         card.className = "link-card";
         
         card.innerHTML = `
-          <div class="link-card-top">
-            <div class="link-favicon-wrapper">
-              <img src="${faviconUrl}" class="link-favicon" onerror="this.style.display='none'">
+          <div class="link-card-header">
+            <div class="link-favicon-large">
+              <img src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/><line x1=%2212%22 y1=%228%22 x2=%2212%22 y2=%2212%22/><line x1=%2212%22 y1=%2216%22 x2=%2212.01%22 y2=%2216%22/></svg>'">
             </div>
             <div class="link-actions-group">
               <button class="btn-card-action" onclick="copyUrl(event, '${link.url}')" title="Copiar URL">📋</button>
@@ -640,118 +558,107 @@
           <div class="link-info">
             <h3>${link.name}</h3>
             <p>${displayUrl}</p>
+          </div>
+          <div class="link-card-footer">
             <span class="link-category-badge">${link.category || 'General'}</span>
+            ${link.isPrivate ? '<span class="link-category-badge private-tag">Privado</span>' : ''}
           </div>
         `;
         linksGrid.appendChild(card);
       });
     }
 
-    window.saveLink = async () => {
+    window.saveLink = function() {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
       const categoryInput = document.getElementById('linkCategory').value.trim() || 'General';
+      const isPrivateInput = document.getElementById('linkIsPrivate').checked;
       const name = nameInput.value.trim();
 
       if (!name || !urlInput) return;
       if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-      if (currentUser) {
-        try {
-          const newLink = { uid: currentUser.uid, name: name, url: urlInput, category: categoryInput, createdAt: Date.now() };
-          const docRef = await addDoc(collection(db, "links"), newLink);
-          links.unshift({ id: docRef.id, ...newLink });
-        } catch (e) {
-          alert("Error al guardar en la nube.");
-          return;
-        }
-      } else {
-        const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput };
-        links.unshift(newLink);
-        saveLocalLinks();
-      }
+      const newLink = { 
+        id: Date.now().toString(), 
+        name: name, 
+        url: urlInput, 
+        category: categoryInput, 
+        isPrivate: isPrivateInput 
+      };
+      
+      links.unshift(newLink);
+      saveLinks();
 
       nameInput.value = '';
       document.getElementById('linkUrl').value = '';
+      document.getElementById('linkIsPrivate').checked = false;
       toggleModal();
-      searchInput.value = '';
       filterAndRender();
-      showToast("Enlace guardado con éxito");
+      showToast("¡Enlace guardado con éxito!");
     };
 
-    window.deleteLink = async (id, event) => {
+    window.deleteLink = function(id, event) {
       event.preventDefault();
-      if (confirm('¿Deseas eliminar este acceso directo?')) {
-        if (currentUser) {
-          try {
-            await deleteDoc(doc(db, "links", id));
-            links = links.filter(link => link.id !== id);
-          } catch (e) {
-            alert("Error al eliminar.");
-            return;
-          }
-        } else {
-          links = links.filter(link => link.id !== id);
-          saveLocalLinks();
-        }
+      if (confirm('¿Deseas eliminar este enlace?')) {
+        links = links.filter(link => link.id !== id);
+        saveLinks();
         filterAndRender();
         showToast("Enlace eliminado");
       }
     };
 
-    window.copyUrl = (event, url) => {
+    window.copyUrl = function(event, url) {
       event.preventDefault();
       navigator.clipboard.writeText(url).then(() => {
         showToast("¡Enlace copiado al portapapeles!");
       });
     };
 
-    window.toggleModal = () => {
-      addModal.classList.toggle('active');
-      if(addModal.classList.contains('active')) document.getElementById('linkName').focus();
+    window.toggleModal = function() {
+      const modal = document.getElementById('addModal');
+      modal.classList.toggle('active');
+      if(modal.classList.contains('active')) document.getElementById('linkName').focus();
     };
 
-    window.closeModalOutside = (e) => {
-      if(e.target === addModal) toggleModal();
+    window.closeModalOutside = function(e) {
+      if(e.target === document.getElementById('addModal')) toggleModal();
     };
 
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.innerText = message;
       toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
-
-    document.addEventListener('gesturestart', (e) => e.preventDefault());
-    document.addEventListener('touchmove', (event) => {
-      if (event.scale && event.scale !== 1) event.preventDefault();
-    }, { passive: false });
   </script>
 </head>
-<body>
+<body onload="initApp()">
 
   <div id="app-content">
     <header>
       <div class="header-top">
         <div class="header-brand">
-          <div class="brand-icon">⚡</div>
+          <div class="brand-icon">📚</div>
           <div class="brand-info">
-            <h1>Mis Enlaces</h1>
+            <h1>PocketHub</h1>
             <span id="linkCountBadge">0 enlaces</span>
           </div>
         </div>
+
         <div class="header-actions">
-          <button class="btn-primary" onclick="toggleModal()">+ Agregar Enlace</button>
-          <div id="authContainer"></div>
+          <!-- Selector de Baúles (Público / Privado) -->
+          <div class="vault-tabs">
+            <button class="vault-tab active" id="tab-public" onclick="switchVault('public')">Públicos</button>
+            <button class="vault-tab" id="tab-private" onclick="switchVault('private')">🔒 Privados</button>
+          </div>
+          <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
         </div>
       </div>
 
       <div class="controls-container">
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." autocomplete="off" oninput="filterAndRender()">
+          <input type="text" id="searchInput" placeholder="Buscar en tus lecturas..." autocomplete="off" oninput="filterAndRender()">
         </div>
         <div class="categories-bar" id="categoriesBar"></div>
       </div>
@@ -762,30 +669,37 @@
     </main>
   </div>
 
+  <!-- MODAL DE NUEVO ENLACE CON OPCIÓN PRIVADA -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
-      <h2>Agregar Nuevo Enlace</h2>
+      <h2>Guardar Nuevo Enlace</h2>
       <div class="input-group">
-        <label>Nombre del sitio</label>
-        <input type="text" id="linkName" placeholder="Ej. GitHub / KDP" autocomplete="off">
+        <label>Título del Sitio</label>
+        <input type="text" id="linkName" placeholder="Ej. Artículo de Interés" autocomplete="off">
       </div>
       <div class="input-group">
-        <label>Dirección URL</label>
-        <input type="url" id="linkUrl" placeholder="Ej. github.com" autocomplete="off">
+        <label>URL de la Web</label>
+        <input type="url" id="linkUrl" placeholder="Ej. medium.com/articulo" autocomplete="off">
       </div>
       <div class="input-group">
         <label>Categoría</label>
-        <input type="text" id="linkCategory" list="defaultCategories" placeholder="Ej. Trabajo, Herramientas, Lectura..." autocomplete="off">
+        <input type="text" id="linkCategory" list="defaultCategories" placeholder="Ej. Lectura, Trabajo..." autocomplete="off">
         <datalist id="defaultCategories">
+          <option value="Lectura"></option>
           <option value="Trabajo"></option>
           <option value="Herramientas"></option>
-          <option value="Lectura"></option>
           <option value="Personal"></option>
         </datalist>
       </div>
+      <div class="input-group">
+        <label class="checkbox-group">
+          <input type="checkbox" id="linkIsPrivate">
+          <span>Guardar en el Baúl Privado (Protegido)</span>
+        </label>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
-        <button class="btn-submit" onclick="saveLink()">Guardar Enlace</button>
+        <button class="btn-submit" onclick="saveLink()">Guardar en Pocket</button>
       </div>
     </div>
   </div>
