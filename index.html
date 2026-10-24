@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PocketHub — Tus Enlaces</title>
+  <title>PocketHub Suite — Todo en Uno</title>
   
-  <!-- Icono / Logo representativo para la app y acceso directo en iPhone / Android -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
   <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
 
   <style>
@@ -22,6 +21,7 @@
       --accent: #6366f1;
       --accent-hover: #4f46e5;
       --danger: #ef4444;
+      --success: #10b981;
       --radius: 16px;
       --radius-sm: 10px;
       --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -62,19 +62,148 @@
       padding-bottom: 50px;
     }
 
-    #app-content {
+    /* --- MENÚ HAMBURGUESA --- */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .menu-btn:hover { border-color: var(--border-focus); background: var(--bg-card); }
+
+    .sidebar-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+      z-index: 105;
+      display: none;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .sidebar-overlay.active { display: block; opacity: 1; }
+
+    .sidebar {
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100vh;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      z-index: 110;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: left var(--transition);
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    }
+    .sidebar.active { left: 0; }
+
+    .sidebar-header {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-item {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-left: 4px solid var(--accent);
+    }
+
+    /* --- CONTENEDORES DE VISTAS (SPA) --- */
+    .view-section {
       width: 100%;
       max-width: 1100px;
-      padding: 0 20px;
-      display: flex;
+      padding: 80px 20px 20px 20px;
+      display: none;
       flex-direction: column;
       align-items: center;
       animation: fadeIn 0.3s ease;
     }
+    .view-section.active { display: flex; }
 
-    header {
+    /* --- VISTA HOME --- */
+    .home-hero {
+      text-align: center;
+      max-width: 600px;
+      margin-top: 40px;
+      padding: 40px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .home-hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .home-hero p { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.5; }
+
+    /* --- VISTA METADATOS --- */
+    .meta-container {
       width: 100%;
-      padding: 30px 0 20px 0;
+      max-width: 700px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .meta-container h2 { font-size: 1.4rem; margin-bottom: 8px; font-weight: 700; }
+    .meta-container p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+    .dropzone {
+      border: 2px dashed var(--border);
+      background: var(--bg-base);
+      padding: 40px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 20px;
+    }
+    .dropzone:hover { border-color: var(--border-focus); background: var(--bg-card); }
+    .dropzone input { display: none; }
+    .dropzone-text { font-size: 0.95rem; color: var(--text-muted); }
+    .dropzone-text strong { color: var(--accent); }
+
+    .preview-box {
+      margin: 20px 0;
+      max-height: 250px;
+      display: none;
+    }
+    .preview-box img { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); }
+
+    /* --- VISTA ENLACES (ESTILO POCKET) --- */
+    header.links-header {
+      width: 100%;
+      padding: 10px 0 20px 0;
       position: sticky;
       top: 0;
       background: var(--bg-base);
@@ -99,409 +228,135 @@
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       background: linear-gradient(135deg, #6366f1, #a855f7);
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
-    .brand-info h1 { 
-      font-size: 1.3rem; 
-      font-weight: 700; 
-      letter-spacing: -0.02em;
-    }
+    .brand-info h1 { font-size: 1.3rem; font-weight: 700; }
+    .brand-info span { font-size: 0.78rem; color: var(--text-muted); }
 
-    .brand-info span {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
     .btn-primary {
-      background: var(--accent);
-      color: #ffffff;
-      border: none;
-      padding: 10px 18px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
+      background: var(--accent); color: #ffffff; border: none;
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: var(--transition);
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
     .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
     .btn-google {
-      background: #ffffff;
-      color: #18181b;
-      border: 1px solid #e4e4e7;
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
+      background: #ffffff; color: #18181b; border: 1px solid #e4e4e7;
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 10px; transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .btn-google:hover { background: #f4f4f5; }
-    .btn-google svg { width: 16px; height: 16px; }
+    .btn-google svg { width: 18px; height: 18px; }
 
     .user-profile-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      padding: 4px 12px 4px 6px;
-      border-radius: 50px;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      padding: 4px 12px 4px 6px; border-radius: 50px;
     }
-
-    .user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .btn-logout { 
-      color: var(--danger); 
-      background: transparent;
-      border: none;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .btn-logout { color: var(--danger); background: transparent; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
 
     .vault-tabs {
-      display: flex;
-      gap: 6px;
-      background: var(--bg-surface);
-      padding: 4px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
+      display: flex; gap: 6px; background: var(--bg-surface); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border);
     }
-
     .vault-tab {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
+      background: transparent; border: none; color: var(--text-muted); padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition);
     }
-    .vault-tab.active {
-      background: var(--bg-card);
-      color: var(--text-main);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+    .vault-tab.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-    .controls-container {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 18px;
-      width: 100%;
-    }
-
-    .search-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
+    .controls-container { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; width: 100%; }
+    .search-wrapper { position: relative; width: 100%; }
     .search-wrapper input {
-      width: 100%;
-      background-color: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 12px 16px 12px 44px;
-      font-size: 0.95rem;
-      outline: none;
-      border-radius: var(--radius);
-      transition: var(--transition);
+      width: 100%; background-color: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); padding: 12px 16px 12px 44px; font-size: 0.95rem; outline: none; border-radius: var(--radius); transition: var(--transition);
     }
     .search-wrapper input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
-
-    .categories-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
+    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .categories-bar::-webkit-scrollbar { display: none; }
-
     .category-chip {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: var(--transition);
+      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 500; cursor: pointer; white-space: nowrap; transition: var(--transition);
     }
     .category-chip:hover { border-color: var(--border-focus); color: var(--text-main); }
-    .category-chip.active {
-      background: var(--text-main);
-      color: var(--bg-base);
-      border-color: transparent;
-    }
+    .category-chip.active { background: var(--text-main); color: var(--bg-base); border-color: transparent; }
 
-    main { width: 100%; margin-top: 10px; }
-
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; }
 
     .link-card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+      background-color: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; transition: var(--transition); box-shadow: var(--shadow); overflow: hidden;
     }
-    .link-card:hover { 
-      border-color: var(--border-focus); 
-      background-color: var(--bg-card-hover); 
-      transform: translateY(-4px); 
-    }
-
-    .link-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
+    .link-card:hover { border-color: var(--border-focus); background-color: var(--bg-card-hover); transform: translateY(-4px); }
+    .link-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .link-favicon-large {
-      width: 52px;
-      height: 52px;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 52px; height: 52px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-
-    .link-favicon-large img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-    }
-
-    .link-actions-group {
-      display: flex;
-      gap: 6px;
-      opacity: 0;
-      transition: var(--transition);
-    }
+    .link-favicon-large img { width: 28px; height: 28px; object-fit: contain; }
+    .link-actions-group { display: flex; gap: 6px; opacity: 0; transition: var(--transition); }
     .link-card:hover .link-actions-group { opacity: 1; }
-
     .btn-card-action {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      transition: var(--transition);
+      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: var(--transition);
     }
     .btn-card-action:hover { color: var(--text-main); border-color: var(--border-focus); background: var(--bg-card); }
     .btn-delete:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.4); }
 
-    .link-info h3 {
-      font-size: 1.05rem; 
-      font-weight: 600; 
-      margin-bottom: 6px;
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis;
-      color: var(--text-main);
-    }
+    .link-info h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-info p { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 14px; }
+    .link-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .link-category-badge { background: var(--bg-base); border: 1px solid var(--border); padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
+    .private-tag { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
 
-    .link-info p {
-      font-size: 0.82rem; 
-      color: var(--text-muted);
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis;
-      margin-bottom: 14px;
-    }
-
-    .link-card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-    }
-
-    .link-category-badge {
-      display: inline-block;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .private-tag {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-      border-color: rgba(239, 68, 68, 0.2);
-    }
-
-    /* Modales */
+    /* Modales generales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
-      display: none; justify-content: center; align-items: center; z-index: 100;
-      padding: 20px;
-      animation: fadeIn 0.2s ease;
+      display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; animation: fadeIn 0.2s ease;
     }
     .modal-overlay.active { display: flex; }
-
     .modal {
-      background: var(--bg-surface); width: 100%; max-width: 420px;
-      padding: 30px; border-radius: var(--radius); border: 1px solid var(--border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      background: var(--bg-surface); width: 100%; max-width: 420px; padding: 30px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
     .modal h2 { margin-bottom: 16px; font-size: 1.2rem; font-weight: 700; }
     .modal p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4; }
-    
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
     .input-group input {
-      width: 100%; background: var(--bg-base); border: 1px solid var(--border);
-      color: var(--text-main); padding: 12px 14px; border-radius: var(--radius-sm);
-      font-size: 0.95rem; outline: none; transition: var(--transition);
+      width: 100%; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-main); padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.95rem; outline: none; transition: var(--transition);
     }
     .input-group input:focus { border-color: var(--border-focus); }
-
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .checkbox-group input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-    .checkbox-group span {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-main);
-    }
-
+    .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; cursor: pointer; user-select: none; }
+    .checkbox-group input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .checkbox-group span { font-size: 0.9rem; font-weight: 500; }
     .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
     .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 600; border: none; }
     .btn-cancel { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
     .btn-cancel:hover { background: var(--bg-card); }
     .btn-submit { background: var(--accent); color: #fff; }
     .btn-submit:hover { background: var(--accent-hover); }
-
-    .pin-link {
-      display: block;
-      text-align: right;
-      font-size: 0.78rem;
-      color: var(--accent);
-      margin-top: 8px;
-      cursor: pointer;
-      text-decoration: none;
-    }
+    .pin-link { display: block; text-align: right; font-size: 0.78rem; color: var(--accent); margin-top: 8px; cursor: pointer; text-decoration: none; }
     .pin-link:hover { text-decoration: underline; }
 
     #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--text-main);
-      color: var(--bg-base);
-      padding: 10px 22px;
-      border-radius: 30px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 1000;
-      pointer-events: none;
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--text-main); color: var(--bg-base); padding: 10px 22px; border-radius: 30px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; pointer-events: none;
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      grid-column: 1 / -1;
-      background: var(--bg-surface);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-    }
-
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); font-size: 0.95rem; grid-column: 1 / -1; background: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 768px) {
-      .link-actions-group { opacity: 1; }
-    }
   </style>
 
-  <!-- Firebase SDKs (Modular v10) -->
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -535,17 +390,13 @@
 
     function loadLocalLinks() {
       try {
-        const stored = localStorage.getItem('pockethub_links_v4');
+        const stored = localStorage.getItem('pockethub_links_v5');
         links = stored ? JSON.parse(stored) : defaultLinks;
-      } catch(e) {
-        links = defaultLinks;
-      }
+      } catch(e) { links = defaultLinks; }
     }
 
     function saveLocalLinks() {
-      try {
-        localStorage.setItem('pockethub_links_v4', JSON.stringify(links));
-      } catch(e) {}
+      try { localStorage.setItem('pockethub_links_v5', JSON.stringify(links)); } catch(e) {}
     }
 
     setPersistence(auth, browserLocalPersistence).catch(console.error);
@@ -569,8 +420,8 @@
         await fetchCloudLinks(currentUser.uid);
         showToast("¡Sincronizado con Google!");
       } catch (error) {
-        console.error("Error en login:", error);
-        alert("No se pudo iniciar sesión con Google. Permite las ventanas emergentes.");
+        console.error("Error login:", error);
+        alert("No se pudo iniciar sesión con Google.");
       }
     };
 
@@ -578,9 +429,7 @@
       try {
         await signOut(auth);
         showToast("Sesión cerrada");
-      } catch (error) {
-        console.error("Error al salir:", error);
-      }
+      } catch (error) { console.error("Error al salir:", error); }
     };
 
     async function fetchCloudLinks(uid) {
@@ -596,12 +445,7 @@
           loadLocalLinks();
           for (const l of links) {
             await addDoc(collection(db, "links"), {
-              uid: uid,
-              name: l.name,
-              url: l.url,
-              category: l.category || 'General',
-              isPrivate: l.isPrivate || false,
-              createdAt: Date.now()
+              uid: uid, name: l.name, url: l.url, category: l.category || 'General', isPrivate: l.isPrivate || false, createdAt: Date.now()
             });
           }
           await fetchCloudLinks(uid);
@@ -612,37 +456,32 @@
         filterAndRender();
         updateAuthUI();
       } catch (e) {
-        console.error("Error nube:", e);
         loadLocalLinks();
         filterAndRender();
       }
     }
 
     function updateAuthUI() {
-      const authContainer = document.getElementById('authContainer');
-      if (currentUser) {
-        authContainer.innerHTML = `
-          <div class="user-profile-group">
-            <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
-            <button class="btn-logout" onclick="logout()" title="Salir">Salir</button>
-          </div>
-        `;
-      } else {
-        authContainer.innerHTML = `
-          <button class="btn-google" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
-            </svg>
-            Sincronizar
-          </button>
-        `;
-      }
+      const containerHome = document.getElementById('authContainerHome');
+      const containerLinks = document.getElementById('authContainerLinks');
+      
+      const content = currentUser ? `
+        <div class="user-profile-group">
+          <img src="${currentUser.photoURL || ''}" class="user-avatar" alt="Avatar">
+          <button class="btn-logout" onclick="logout()" title="Salir">Salir</button>
+        </div>
+      ` : `
+        <button class="btn-google" onclick="loginWithGoogle()">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          Iniciar sesión con Google
+        </button>
+      `;
+
+      if(containerHome) containerHome.innerHTML = content;
+      if(containerLinks) containerLinks.innerHTML = content;
     }
 
-    // --- LÓGICA DE BAÚL PRIVADO Y MODAL DE PIN ---
+    // --- LÓGICA DE BAÚL PRIVADO ---
     window.switchVault = function(vaultType) {
       if (vaultType === 'private') {
         document.getElementById('pinModal').classList.add('active');
@@ -675,19 +514,16 @@
       }
     }
 
-    window.closePinModal = function() {
-      document.getElementById('pinModal').classList.remove('active');
-    }
+    window.closePinModal = function() { document.getElementById('pinModal').classList.remove('active'); }
 
     window.forgotPin = function() {
       closePinModal();
       const confirmationPhrase = "borrar todo y empezar de nuevo";
-      const userInput = prompt(`⚠️ ATENCIÓN:\nPor seguridad, al recuperar el PIN todos los enlaces privados serán borrados.\n\nEscribe exactamente esta frase para continuar:\n"${confirmationPhrase}"`);
+      const userInput = prompt(`⚠️ ATENCIÓN:\nAl recuperar el PIN se borrarán los enlaces privados.\n\nEscribe exactamente:\n"${confirmationPhrase}"`);
       
       if (userInput === confirmationPhrase) {
         links = links.filter(l => !l.isPrivate);
         saveLocalLinks();
-        
         const newPin = prompt("¡Frase correcta! Ingresa tu nuevo PIN numérico:");
         if (newPin && newPin.trim().length > 0) {
           localStorage.setItem('pockethub_pin', newPin.trim());
@@ -698,17 +534,16 @@
           filterAndRender();
         } else {
           localStorage.setItem('pockethub_pin', '2027');
-          showToast("PIN restablecido a valor por defecto (2027)");
+          showToast("PIN restablecido a 2027");
         }
       } else if (userInput !== null) {
-        showToast("La frase no coincide. No se realizaron cambios.");
+        showToast("La frase no coincide.");
       }
     }
 
     window.togglePrivateCategory = function() {
       const isPrivate = document.getElementById('linkIsPrivate').checked;
-      const categoryGroup = document.getElementById('categoryGroup');
-      categoryGroup.style.display = isPrivate ? 'none' : 'block';
+      document.getElementById('categoryGroup').style.display = isPrivate ? 'none' : 'block';
     }
 
     window.renderCategoriesBar = function() {
@@ -721,11 +556,7 @@
         const chip = document.createElement('button');
         chip.className = `category-chip ${currentCategoryFilter === cat ? 'active' : ''}`;
         chip.innerText = cat;
-        chip.onclick = () => {
-          currentCategoryFilter = cat;
-          renderCategoriesBar();
-          filterAndRender();
-        };
+        chip.onclick = () => { currentCategoryFilter = cat; renderCategoriesBar(); filterAndRender(); };
         categoriesBar.appendChild(chip);
       });
     }
@@ -740,7 +571,6 @@
         const matchesCategory = currentCategoryFilter === 'Todos' || (link.category || 'General') === currentCategoryFilter;
         return matchesQuery && matchesCategory;
       });
-
       renderLinksGrid(filtered);
     }
 
@@ -751,7 +581,7 @@
       linkCountBadge.innerText = `${linksToRender.length} ${linksToRender.length === 1 ? 'enlace' : 'enlaces'}`;
 
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces en este baúl. ¡Agrega uno nuevo!</div>`;
+        linksGrid.innerHTML = `<div class="empty-state">No hay enlaces en este baúl.</div>`;
         return;
       }
 
@@ -762,24 +592,16 @@
         const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
         const card = document.createElement('a');
-        card.href = link.url;
-        card.target = "_blank";
-        card.className = "link-card";
-        
+        card.href = link.url; card.target = "_blank"; card.className = "link-card";
         card.innerHTML = `
           <div class="link-card-header">
-            <div class="link-favicon-large">
-              <img src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/><line x1=%2212%22 y1=%228%22 x2=%2212%22 y2=%2212%22/><line x1=%2212%22 y1=%2216%22 x2=%2212.01%22 y2=%2216%22/></svg>'">
-            </div>
+            <div class="link-favicon-large"><img src="${faviconUrl}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/><line x1=%2212%22 y1=%228%22 x2=%2212%22 y2=%2212%22/><line x1=%2212%22 y1=%2216%22 x2=%2212.01%22 y2=%2216%22/></svg>'"></div>
             <div class="link-actions-group">
               <button class="btn-card-action" onclick="copyUrl(event, '${link.url}')" title="Copiar URL">📋</button>
               <button class="btn-card-action btn-delete" onclick="deleteLink('${link.id}', event)" title="Eliminar">✕</button>
             </div>
           </div>
-          <div class="link-info">
-            <h3>${link.name}</h3>
-            <p>${displayUrl}</p>
-          </div>
+          <div class="link-info"><h3>${link.name}</h3><p>${displayUrl}</p></div>
           <div class="link-card-footer">
             <span class="link-category-badge">${link.category || 'General'}</span>
             ${link.isPrivate ? '<span class="link-category-badge private-tag">Privado</span>' : ''}
@@ -804,46 +626,36 @@
           const newLink = { uid: currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: false, createdAt: Date.now() };
           const docRef = await addDoc(collection(db, "links"), newLink);
           links.unshift({ id: docRef.id, ...newLink });
-        } catch (e) {
-          alert("Error al guardar en la nube.");
-          return;
-        }
+        } catch (e) { alert("Error al guardar en la nube."); return; }
       } else {
         const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput };
         links.unshift(newLink);
         saveLocalLinks();
       }
 
-      nameInput.value = '';
-      document.getElementById('linkUrl').value = '';
+      nameInput.value = ''; document.getElementById('linkUrl').value = '';
       document.getElementById('linkIsPrivate').checked = false;
       document.getElementById('categoryGroup').style.display = 'block';
-      toggleModal();
-      filterAndRender();
-      showToast("¡Enlace guardado con éxito!");
+      toggleModal(); filterAndRender();
+      showToast("¡Enlace guardado!");
     };
 
     window.deleteLink = async function(id, event) {
       event.preventDefault();
-      if (confirm('¿Deseas eliminar este enlace?')) {
+      if (confirm('¿Eliminar este enlace?')) {
         const linkToDelete = links.find(l => l.id === id);
         if (currentUser && linkToDelete && !linkToDelete.isPrivate) {
-          try {
-            await deleteDoc(doc(db, "links", id));
-          } catch(e) {}
+          try { await deleteDoc(doc(db, "links", id)); } catch(e) {}
         }
         links = links.filter(link => link.id !== id);
-        saveLocalLinks();
-        filterAndRender();
+        saveLocalLinks(); filterAndRender();
         showToast("Enlace eliminado");
       }
     };
 
     window.copyUrl = function(event, url) {
       event.preventDefault();
-      navigator.clipboard.writeText(url).then(() => {
-        showToast("¡Enlace copiado al portapapeles!");
-      });
+      navigator.clipboard.writeText(url).then(() => { showToast("¡Enlace copiado!"); });
     };
 
     window.toggleModal = function() {
@@ -858,24 +670,102 @@
 
     function showToast(message) {
       const toast = document.getElementById('toast');
-      toast.innerText = message;
-      toast.classList.add('show');
+      toast.innerText = message; toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2500);
+    }
+
+    // --- NAVEGACIÓN SPA ENTRE VISTAS ---
+    window.switchView = function(viewId) {
+      document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+      document.getElementById(`view-${viewId}`).classList.add('active');
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      document.getElementById(`nav-${viewId}`).classList.add('active');
+      toggleSidebar();
+    }
+
+    window.toggleSidebar = function() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    // --- REMOVEDOR DE METADATOS DE IA ---
+    window.handleImageUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          const cleanDataUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 1.0);
+          
+          const previewBox = document.getElementById('previewBox');
+          const previewImg = document.getElementById('previewImg');
+          const downloadBtn = document.getElementById('downloadCleanBtn');
+          
+          previewImg.src = cleanDataUrl;
+          previewBox.style.display = 'block';
+
+          downloadBtn.onclick = function() {
+            const a = document.createElement('a');
+            a.href = cleanDataUrl;
+            a.download = `clean-ai-${Date.now()}.${file.type === 'image/png' ? 'png' : 'jpg'}`;
+            a.click();
+            showToast("Imagen descargada sin metadatos");
+          };
+          showToast("¡Metadatos eliminados con éxito!");
+        }
+        img.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
     }
   </script>
 </head>
-<body onload="loadLocalLinks(); filterAndRender();">
+<body onload="loadLocalLinks(); filterAndRender(); updateAuthUI();">
 
-  <div id="app-content">
-    <header>
+  <!-- BOTÓN MENÚ HAMBURGUESA -->
+  <button class="menu-btn" onclick="toggleSidebar()" title="Menú">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- MENÚ LATERAL DESPLEGABLE -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;">⚡</div>
+      PocketHub Suite
+    </div>
+    <button class="sidebar-item active" id="nav-home" onclick="switchView('home')">🏠 Home</button>
+    <button class="sidebar-item" id="nav-links" onclick="switchView('links')">🔗 Enlaces</button>
+    <button class="sidebar-item" id="nav-metadata" onclick="switchView('metadata')">🖼️ Metadatos</button>
+  </aside>
+
+  <!-- ================= VISTA 1: HOME (PÁGINA PRINCIPAL) ================= -->
+  <section class="view-section active" id="view-home">
+    <div class="home-hero">
+      <h1>Bienvenido a PocketHub</h1>
+      <p>Tu centro multifuncional personal. Sincroniza tus accesos directos o limpia tus imágenes generadas por IA de forma privada.</p>
+      <div id="authContainerHome" style="display: flex; justify-content: center;"></div>
+    </div>
+  </section>
+
+  <!-- ================= VISTA 2: ENLACES ================= -->
+  <section class="view-section" id="view-links">
+    <header class="links-header" style="background:transparent; border:none; padding:0; margin-bottom:20px; width:100%;">
       <div class="header-top">
         <div class="header-brand">
           <div class="brand-icon">
-            <!-- Logo representativo de Enlace / Cadena -->
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
           </div>
           <div class="brand-info">
-            <h1>PocketHub</h1>
+            <h1>Mis Enlaces</h1>
             <span id="linkCountBadge">0 enlaces</span>
           </div>
         </div>
@@ -886,7 +776,7 @@
             <button class="vault-tab" id="tab-private" onclick="switchVault('private')">🔒 Privados</button>
           </div>
           <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
-          <div id="authContainer"></div>
+          <div id="authContainerLinks"></div>
         </div>
       </div>
 
@@ -899,12 +789,35 @@
       </div>
     </header>
 
-    <main>
+    <main style="width: 100%;">
       <div class="links-grid" id="linksGrid"></div>
     </main>
-  </div>
+  </section>
 
-  <!-- MODAL DE INGRESO DE PIN PRIVADO CON OPCIÓN DE RECUPERAR -->
+  <!-- ================= VISTA 3: REMOVEDOR DE METADATOS DE IA ================= -->
+  <section class="view-section" id="view-metadata">
+    <div class="meta-container">
+      <h2>Limpiador de Metadatos de IA</h2>
+      <p>Sube cualquier imagen generada por IA. El sistema eliminará todo el rastro de metadatos EXIF de forma local para que puedas descargarla nítida y en su resolución original.</p>
+      
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+        <div class="dropzone-text">
+          📁 <strong>Haz clic para seleccionar</strong> o arrastra tu foto aquí
+        </div>
+      </label>
+
+      <div class="preview-box" id="previewBox">
+        <p style="font-size: 0.85rem; color: var(--success); margin-bottom: 8px; font-weight: 600;">✓ Imagen limpia procesada con éxito</p>
+        <img id="previewImg" alt="Vista previa limpia">
+        <div style="margin-top: 16px;">
+          <button class="btn-primary" id="downloadCleanBtn" style="margin: 0 auto;">⬇️ Descargar Imagen Limpia (Calidad Original)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE INGRESO DE PIN PRIVADO -->
   <div class="modal-overlay" id="pinModal">
     <div class="modal">
       <h2>Acceso Privado</h2>
