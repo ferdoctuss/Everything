@@ -514,11 +514,11 @@
     }
   </style>
 
-  <!-- Firebase SDKs -->
+  <!-- Script 1: FIREBASE Y ENLACES (Módulo seguro) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC6uQzOIIt2vM54CR27G4hvJDWz_NKv61Y",
@@ -568,8 +568,8 @@
       } else {
         currentUser = null;
         loadLocalLinks();
-        filterAndRender();
-        updateAuthUI();
+        window.filterAndRender();
+        window.updateAuthUI();
       }
     });
 
@@ -578,7 +578,7 @@
         const result = await signInWithPopup(auth, provider);
         currentUser = result.user;
         await fetchCloudLinks(currentUser.uid);
-        showToast("¡Sincronizado con Google!");
+        window.showToast("¡Sincronizado con Google!");
       } catch (error) {
         console.error("Error login:", error);
         alert("No se pudo iniciar sesión con Google.");
@@ -588,7 +588,7 @@
     window.logout = async () => {
       try {
         await signOut(auth);
-        showToast("Sesión cerrada");
+        window.showToast("Sesión cerrada");
       } catch (error) { console.error("Error al salir:", error); }
     };
 
@@ -613,15 +613,15 @@
         }
 
         links = cloudLinks;
-        filterAndRender();
-        updateAuthUI();
+        window.filterAndRender();
+        window.updateAuthUI();
       } catch (e) {
         loadLocalLinks();
-        filterAndRender();
+        window.filterAndRender();
       }
     }
 
-    function updateAuthUI() {
+    window.updateAuthUI = function() {
       const target = document.getElementById('accountCorner');
       if (!target) return;
       target.replaceChildren();
@@ -647,13 +647,12 @@
       event.preventDefault(); event.stopPropagation();
       const link=links.find(l=>String(l.id)===String(id)); if(!link)return;
       const key=String(id);
-      if(pinnedIds.has(key)) { pinnedIds.delete(key); showToast('Enlace desfijado'); }
-      else { if(pinnedIds.size>=5){showToast('Solo puedes fijar 5 enlaces');return;} pinnedIds.add(key);showToast('Enlace fijado'); }
+      if(pinnedIds.has(key)) { pinnedIds.delete(key); window.showToast('Enlace desfijado'); }
+      else { if(pinnedIds.size>=5){window.showToast('Solo puedes fijar 5 enlaces');return;} pinnedIds.add(key);window.showToast('Enlace fijado'); }
       localStorage.setItem(pinnedKey,JSON.stringify([...pinnedIds]));
-      filterAndRender();
+      window.filterAndRender();
     };
 
-    // --- LÓGICA DE BAÚL PRIVADO ---
     window.switchVault = function(vaultType) {
       if (vaultType === 'private') {
         document.getElementById('pinModal').classList.add('active');
@@ -664,7 +663,7 @@
         document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-public').classList.add('active');
         currentCategoryFilter = 'Todos';
-        filterAndRender();
+        window.filterAndRender();
       }
     }
 
@@ -678,9 +677,9 @@
         document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-private').classList.add('active');
         currentCategoryFilter = 'Todos';
-        filterAndRender();
+        window.filterAndRender();
       } else {
-        showToast("PIN incorrecto");
+        window.showToast("PIN incorrecto");
         document.getElementById('pinInput').value = '';
         document.getElementById('pinInput').focus();
       }
@@ -689,7 +688,7 @@
     window.closePinModal = function() { document.getElementById('pinModal').classList.remove('active'); }
 
     window.forgotPin = function() {
-      closePinModal();
+      window.closePinModal();
       const confirmationPhrase = "borrar todo y empezar de nuevo";
       const userInput = prompt(`⚠️ ATENCIÓN:\nAl recuperar el PIN se borrarán los enlaces privados.\n\nEscribe exactamente:\n"${confirmationPhrase}"`);
       
@@ -699,17 +698,17 @@
         const newPin = prompt("¡Frase correcta! Ingresa tu nuevo PIN numérico:");
         if (newPin && newPin.trim().length > 0) {
           localStorage.setItem('pockethub_pin', newPin.trim());
-          showToast("¡PIN restablecido con éxito!");
+          window.showToast("¡PIN restablecido con éxito!");
           currentVault = 'public';
           document.querySelectorAll('.vault-tab').forEach(t => t.classList.remove('active'));
           document.getElementById('tab-public').classList.add('active');
-          filterAndRender();
+          window.filterAndRender();
         } else {
           localStorage.setItem('pockethub_pin', '2027');
-          showToast("PIN restablecido a 2027");
+          window.showToast("PIN restablecido a 2027");
         }
       } else if (userInput !== null) {
-        showToast("La frase no coincide.");
+        window.showToast("La frase no coincide.");
       }
     }
 
@@ -728,13 +727,13 @@
         const chip = document.createElement('button');
         chip.className = `category-chip ${currentCategoryFilter === cat ? 'active' : ''}`;
         chip.innerText = cat;
-        chip.onclick = () => { currentCategoryFilter = cat; renderCategoriesBar(); filterAndRender(); };
+        chip.onclick = () => { currentCategoryFilter = cat; window.renderCategoriesBar(); window.filterAndRender(); };
         categoriesBar.appendChild(chip);
       });
     }
 
     window.filterAndRender = function() {
-      renderCategoriesBar();
+      window.renderCategoriesBar();
       const queryText = document.getElementById('searchInput').value.toLowerCase();
       const vaultLinks = links.filter(l => currentVault === 'private' ? l.isPrivate : !l.isPrivate);
       
@@ -816,8 +815,8 @@
       nameInput.value = ''; document.getElementById('linkUrl').value = '';
       document.getElementById('linkIsPrivate').checked = false;
       document.getElementById('categoryGroup').style.display = 'block';
-      toggleModal(); filterAndRender();
-      showToast("¡Enlace guardado!");
+      window.toggleModal(); window.filterAndRender();
+      window.showToast("¡Enlace guardado!");
     };
 
     window.deleteLink = async function(id, event) {
@@ -829,14 +828,24 @@
         }
         links = links.filter(link => link.id !== id);
         pinnedIds.delete(String(id)); localStorage.setItem(pinnedKey,JSON.stringify([...pinnedIds]));
-        saveLocalLinks(); filterAndRender();
-        showToast("Enlace eliminado");
+        saveLocalLinks(); window.filterAndRender();
+        window.showToast("Enlace eliminado");
       }
     };
 
+    // Al cargar el módulo, cargamos lo inicial:
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLocalLinks();
+      window.filterAndRender();
+      window.updateAuthUI();
+    });
+  </script>
+
+  <!-- Script 2: INTERFAZ GENERAL, RELOJ Y CALENDARIO (Global) -->
+  <script>
     window.copyUrl = function(event, url) {
       event.preventDefault();
-      navigator.clipboard.writeText(url).then(() => { showToast("¡Enlace copiado!"); });
+      navigator.clipboard.writeText(url).then(() => { window.showToast("¡Enlace copiado!"); });
     };
 
     window.toggleModal = function() {
@@ -846,23 +855,21 @@
     };
 
     window.closeModalOutside = function(e) {
-      if(e.target === document.getElementById('addModal')) toggleModal();
+      if(e.target === document.getElementById('addModal')) window.toggleModal();
     };
 
-    function showToast(message) {
+    window.showToast = function(message) {
       const toast = document.getElementById('toast');
       toast.innerText = message; toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
 
-    // --- NAVEGACIÓN SPA ENTRE VISTAS ---
     window.switchView = function(viewId) {
       document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
       document.getElementById(`view-${viewId}`).classList.add('active');
       window.scrollTo(0, 0);
     }
 
-    // --- COMPARADOR DE TEXTO Y NÚMEROS ---
     window.compareTexts = function() {
       const t1 = document.getElementById('compareText1').value;
       const t2 = document.getElementById('compareText2').value;
@@ -878,7 +885,6 @@
       }
     }
 
-    // --- REMOVEDOR DE METADATOS DE IA ---
     window.handleImageUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -892,7 +898,6 @@
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
-
           const cleanDataUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 1.0);
           
           const previewBox = document.getElementById('previewBox');
@@ -907,217 +912,15 @@
             a.href = cleanDataUrl;
             a.download = `clean-ai-${Date.now()}.${file.type === 'image/png' ? 'png' : 'jpg'}`;
             a.click();
-            showToast("Imagen descargada sin metadatos");
+            window.showToast("Imagen descargada sin metadatos");
           };
-          showToast("¡Metadatos eliminados con éxito!");
+          window.showToast("¡Metadatos eliminados con éxito!");
         }
         img.src = e.target.result;
       }
       reader.readAsDataURL(file);
     }
-  </script>
-</head>
-<body>
-  <div class="account-corner" id="accountCorner"></div>
 
-  <!-- ================= VISTA 1: HOME (PÁGINA PRINCIPAL) ================= -->
-  <section class="view-section active" id="view-home">
-    <div class="home-header">
-      <h1>PocketHub Suite</h1>
-      <p>Tu centro multifuncional personal. Selecciona la herramienta que deseas utilizar:</p>
-    </div>
-
-    <!-- WIDGETS INDEPENDIENTES (HORA PERUANA & CALENDARIO) -->
-    <div class="widgets-grid">
-      <div class="widget-panel">
-        <div class="widget-label">Hora Peruana (PET)</div>
-        <div id="clockTime" class="clock-time">--:--:--</div>
-        <div id="clockDate" class="clock-date">--</div>
-      </div>
-      <div class="widget-panel">
-        <div class="calendar-head">
-          <button onclick="moveCalendar(-1)" aria-label="Mes anterior">‹</button>
-          <strong id="calendarTitle">--</strong>
-          <button onclick="moveCalendar(1)" aria-label="Mes siguiente">›</button>
-        </div>
-        <div id="calendarDays" class="calendar-days"></div>
-      </div>
-    </div>
-
-    <!-- TARJETAS DE APLICACIONES INDEPENDIENTES -->
-    <div class="home-cards-grid">
-      <div class="home-card" onclick="switchView('links')">
-        <div class="home-card-icon">🔗</div>
-        <h3>Mis Enlaces</h3>
-        <span>Gestiona tus baúles públicos y privados con acceso seguro.</span>
-      </div>
-
-      <div class="home-card" onclick="switchView('metadata')">
-        <div class="home-card-icon">🖼️</div>
-        <h3>Limpiador de IA</h3>
-        <span>Quita metadatos EXIF de tus fotos manteniendo calidad original.</span>
-      </div>
-
-      <div class="home-card" onclick="switchView('comparator')">
-        <div class="home-card-icon">⚖️</div>
-        <h3>Comparador</h3>
-        <span>Compara textos o números de forma rápida y exacta.</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= VISTA 2: ENLACES ================= -->
-  <section class="view-section" id="view-links">
-    <button class="back-home-btn" onclick="switchView('home')">
-      ← Volver al Home
-    </button>
-
-    <div class="links-header" style="width:100%;">
-      <div class="header-top">
-        <div class="header-brand">
-          <div class="brand-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-          </div>
-          <div class="brand-info">
-            <h1>Mis Enlaces</h1>
-            <span id="linkCountBadge">0 enlaces</span>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <div class="vault-tabs">
-            <button class="vault-tab active" id="tab-public" onclick="switchVault('public')">Públicos</button>
-            <button class="vault-tab" id="tab-private" onclick="switchVault('private')">🔒 Privados</button>
-          </div>
-          <button class="btn-primary" onclick="toggleModal()">+ Agregar</button>
-        </div>
-      </div>
-
-      <div class="controls-container">
-        <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Buscar en tus lecturas..." autocomplete="off" oninput="filterAndRender()">
-        </div>
-        <div class="categories-bar" id="categoriesBar"></div>
-      </div>
-    </div>
-
-    <main style="width: 100%;">
-      <div class="links-grid" id="linksGrid"></div>
-    </main>
-  </section>
-
-  <!-- ================= VISTA 3: REMOVEDOR DE METADATOS DE IA ================= -->
-  <section class="view-section" id="view-metadata">
-    <button class="back-home-btn" onclick="switchView('home')">
-      ← Volver al Home
-    </button>
-
-    <div class="meta-container">
-      <h2>Limpiador de Metadatos de IA</h2>
-      <p>Sube cualquier imagen generada por IA. El sistema eliminará todo el rastro de metadatos EXIF de forma local para que puedas descargarla nítida y en su resolución original.</p>
-      
-      <label class="dropzone" id="dropzone">
-        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-        <div class="dropzone-text">
-          📁 <strong>Haz clic para seleccionar</strong> o arrastra tu foto aquí
-        </div>
-      </label>
-
-      <div class="preview-box" id="previewBox">
-        <p style="font-size: 0.85rem; color: var(--success); margin-bottom: 8px; font-weight: 600;">✓ Imagen limpia procesada con éxito</p>
-        <img id="previewImg" alt="Vista previa limpia">
-        <div style="margin-top: 20px; display: flex; justify-content: center;">
-          <button class="btn-download-premium" id="downloadCleanBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Descargar Imagen Limpia (Calidad Original)
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= VISTA 4: COMPARADOR DE TEXTOS Y NÚMEROS ================= -->
-  <section class="view-section" id="view-comparator">
-    <button class="back-home-btn" onclick="switchView('home')">
-      ← Volver al Home
-    </button>
-
-    <div class="comparator-container">
-      <h2>Comparador de Texto y Números</h2>
-      <p>Ingresa dos bloques de texto o números para verificar de forma exacta si coinciden por completo.</p>
-      
-      <div class="comparator-inputs">
-        <div class="comparator-group">
-          <label>Texto 1</label>
-          <textarea id="compareText1" placeholder="Escribe o pega el primer texto..."></textarea>
-        </div>
-        <div class="comparator-group">
-          <label>Texto 2</label>
-          <textarea id="compareText2" placeholder="Escribe o pega el segundo texto..."></textarea>
-        </div>
-      </div>
-
-      <button class="btn-comparator" onclick="compareTexts()">Comparar Textos</button>
-
-      <div id="comparatorResult" class="result-card"></div>
-    </div>
-  </section>
-
-  <!-- MODAL DE INGRESO DE PIN PRIVADO -->
-  <div class="modal-overlay" id="pinModal">
-    <div class="modal">
-      <h2>Acceso Privado</h2>
-      <p>Introduce tu PIN de seguridad para desbloquear el baúl privado:</p>
-      <div class="input-group">
-        <input type="password" id="pinInput" placeholder="••••" autocomplete="off" maxlength="10" onkeypress="if(event.key === 'Enter') verifyPin()">
-      </div>
-      <a class="pin-link" onclick="forgotPin()">¿Olvidaste tu PIN?</a>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closePinModal()">Cancelar</button>
-        <button class="btn-submit" onclick="verifyPin()">Ingresar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE NUEVO ENLACE -->
-  <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
-    <div class="modal">
-      <h2>Guardar Nuevo Enlace</h2>
-      <div class="input-group">
-        <label>Título del Sitio</label>
-        <input type="text" id="linkName" placeholder="Ej. Artículo de Interés" autocomplete="off">
-      </div>
-      <div class="input-group">
-        <label>URL de la Web</label>
-        <input type="url" id="linkUrl" placeholder="Ej. medium.com/articulo" autocomplete="off">
-      </div>
-      <div class="input-group" id="categoryGroup">
-        <label>Categoría</label>
-        <input type="text" id="linkCategory" list="defaultCategories" placeholder="Ej. Lectura, Trabajo..." autocomplete="off">
-        <datalist id="defaultCategories">
-          <option value="Lectura"></option>
-          <option value="Trabajo"></option>
-          <option value="Herramientas"></option>
-          <option value="Personal"></option>
-        </datalist>
-      </div>
-      <div class="input-group">
-        <label class="checkbox-group">
-          <input type="checkbox" id="linkIsPrivate" onchange="togglePrivateCategory()">
-          <span>Guardar en el Baúl Privado (Protegido con PIN)</span>
-        </label>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
-        <button class="btn-submit" onclick="saveLink()">Guardar en Pocket</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast"></div>
-
-  <script>
     let calendarCursor = new Date();
     let calendarSelected = new Date();
 
@@ -1131,7 +934,7 @@
       d.textContent = now.toLocaleDateString('es-PE', { timeZone: 'America/Lima', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    function moveCalendar(delta) {
+    window.moveCalendar = function(delta) {
       calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
       renderCalendar();
     }
@@ -1173,11 +976,8 @@
       setInterval(updateClock, 1000);
     }
 
-    // Inicializar dashboard de forma segura al cargar el DOM
+    // Inicializar todo lo visual cuando cargue la página
     document.addEventListener('DOMContentLoaded', () => {
-      loadLocalLinks();
-      filterAndRender();
-      updateAuthUI();
       initDashboard();
     });
 
