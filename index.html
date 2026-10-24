@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <!-- Bloqueo absoluto de zoom y escala en dispositivos móviles -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mis Enlaces — Hub Profesional</title>
   <style>
@@ -19,14 +18,12 @@
       --accent: #f4f4f5;
       --accent-hover: #ffffff;
       --danger: #f87171;
-      --success: #34d399;
       --radius: 12px;
       --radius-sm: 8px;
       --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    /* Adaptabilidad inteligente a temas claros/oscuros del sistema si se desea, manteniendo el núcleo oscuro elegante */
     @media (prefers-color-scheme: light) {
       :root {
         --bg-base: #fafafa;
@@ -57,12 +54,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      touch-action: manipulation; /* Bloquea doble toque para zoom */
+      touch-action: manipulation;
       overflow-x: hidden;
       padding-bottom: 40px;
     }
 
-    /* --- CONTENEDOR PRINCIPAL --- */
     #app-content {
       width: 100%;
       max-width: 1000px;
@@ -73,10 +69,9 @@
       animation: fadeIn 0.3s ease;
     }
 
-    /* --- CABECERA PROFESIONAL --- */
     header {
       width: 100%;
-      padding: 36px 0 24px 0;
+      padding: 36px 0 20px 0;
       position: sticky;
       top: 0;
       background: var(--bg-base);
@@ -84,7 +79,7 @@
       -webkit-backdrop-filter: blur(12px);
       z-index: 20;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .header-top {
@@ -130,7 +125,6 @@
       align-items: center;
     }
 
-    /* Botones de Estilo Superior */
     .btn-primary, .btn-secondary, .btn-google {
       background: var(--bg-surface);
       color: var(--text-main);
@@ -144,7 +138,6 @@
       align-items: center;
       gap: 8px;
       transition: all var(--transition);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .btn-primary {
@@ -167,7 +160,6 @@
     .btn-google:hover { background: #f4f4f5 !important; }
     .btn-google svg { width: 15px; height: 15px; }
 
-    /* Perfil de Usuario Conectado */
     .user-profile-group {
       display: flex;
       align-items: center;
@@ -196,11 +188,17 @@
     }
     .btn-logout:hover { opacity: 0.8; }
 
-    /* --- BARRA DE BÚSQUEDA --- */
+    .controls-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+      width: 100%;
+    }
+
     .search-wrapper {
       position: relative;
       width: 100%;
-      margin-top: 16px;
     }
 
     .search-wrapper input {
@@ -213,12 +211,8 @@
       outline: none;
       border-radius: var(--radius);
       transition: all var(--transition);
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
     }
-    .search-wrapper input:focus { 
-      border-color: var(--border-focus); 
-      box-shadow: 0 0 0 3px rgba(161, 161, 170, 0.1); 
-    }
+    .search-wrapper input:focus { border-color: var(--border-focus); }
 
     .search-icon {
       position: absolute;
@@ -230,8 +224,35 @@
       pointer-events: none;
     }
 
-    /* --- GRID DE ENLACES --- */
-    main { width: 100%; }
+    .categories-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .categories-bar::-webkit-scrollbar { display: none; }
+
+    .category-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition);
+    }
+    .category-chip:hover { border-color: var(--border-focus); color: var(--text-main); }
+    .category-chip.active {
+      background: var(--text-main);
+      color: var(--bg-base);
+      border-color: transparent;
+    }
+
+    main { width: 100%; margin-top: 10px; }
 
     .links-grid {
       display: grid;
@@ -324,13 +345,24 @@
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis;
+      margin-bottom: 10px;
     }
 
-    /* --- MODAL PROFESIONAL --- */
+    .link-category-badge {
+      display: inline-block;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      align-self: flex-start;
+    }
+
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       display: none; justify-content: center; align-items: center; z-index: 100;
       padding: 20px;
       animation: fadeIn 0.2s ease;
@@ -342,16 +374,16 @@
       padding: 28px; border-radius: var(--radius); border: 1px solid var(--border);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
-    .modal h2 { margin-bottom: 20px; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+    .modal h2 { margin-bottom: 20px; font-size: 1.1rem; font-weight: 600; }
     
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
-    .input-group input {
+    .input-group input, .input-group select {
       width: 100%; background: var(--bg-base); border: 1px solid var(--border);
       color: var(--text-main); padding: 12px 14px; border-radius: var(--radius-sm);
       font-size: 0.95rem; outline: none; transition: border-color var(--transition);
     }
-    .input-group input:focus { border-color: var(--border-focus); }
+    .input-group input:focus, .input-group select:focus { border-color: var(--border-focus); }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
     .btn-cancel, .btn-submit { flex: 1; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; border: none; }
@@ -360,7 +392,6 @@
     .btn-submit { background: var(--text-main); color: var(--bg-base); }
     .btn-submit:hover { opacity: 0.9; }
 
-    /* Notificación flotante (Toast) */
     #toast {
       position: fixed;
       bottom: 24px;
@@ -392,7 +423,6 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Forzar visibilidad de botones de acción en pantallas táctiles de móviles */
     @media (max-width: 768px) {
       .link-actions-group { opacity: 1; }
     }
@@ -401,7 +431,7 @@
   <!-- Firebase SDKs (Modular v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -421,10 +451,11 @@
 
     let currentUser = null;
     let links = [];
+    let currentCategoryFilter = 'Todos';
 
     const defaultLinks = [
-      { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com" },
-      { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com" }
+      { id: '1', name: "Render Dashboard", url: "https://dashboard.render.com", category: "Herramientas" },
+      { id: '2', name: "Amazon KDP", url: "https://kdp.amazon.com", category: "Trabajo" }
     ];
 
     const linksGrid = document.getElementById('linksGrid');
@@ -432,10 +463,11 @@
     const addModal = document.getElementById('addModal');
     const authContainer = document.getElementById('authContainer');
     const linkCountBadge = document.getElementById('linkCountBadge');
+    const categoriesBar = document.getElementById('categoriesBar');
 
     function loadLocalLinks() {
       try {
-        const stored = localStorage.getItem('min_links_pro');
+        const stored = localStorage.getItem('min_links_categories');
         links = stored ? JSON.parse(stored) : defaultLinks;
       } catch(e) {
         links = defaultLinks;
@@ -444,11 +476,18 @@
 
     function saveLocalLinks() {
       try {
-        localStorage.setItem('min_links_pro', JSON.stringify(links));
+        localStorage.setItem('min_links_categories', JSON.stringify(links));
       } catch(e) {}
     }
 
-    setPersistence(auth, browserLocalPersistence).catch(console.error);
+    // Configurar persistencia local y manejar resultado de redirección segura para móviles
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        return getRedirectResult(auth);
+      })
+      .catch((error) => {
+        console.error("Error en auth:", error);
+      });
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -457,20 +496,18 @@
       } else {
         currentUser = null;
         loadLocalLinks();
-        renderLinks(links);
+        filterAndRender();
         updateAuthUI();
       }
     });
 
+    // Usar Redirección en lugar de Popup para compatibilidad total con móviles y navegadores privados
     window.loginWithGoogle = async () => {
       try {
-        const result = await signInWithPopup(auth, provider);
-        currentUser = result.user;
-        await fetchCloudLinks(currentUser.uid);
-        showToast("¡Sincronizado con éxito!");
+        await signInWithRedirect(auth, provider);
       } catch (error) {
-        console.error("Error al iniciar sesión:", error);
-        alert("No se pudo iniciar sesión con Google. Permite las ventanas emergentes.");
+        console.error("Error al iniciar sesión con redirección:", error);
+        alert("No se pudo iniciar sesión con Google.");
       }
     };
 
@@ -489,7 +526,7 @@
         const querySnapshot = await getDocs(q);
         let cloudLinks = [];
         querySnapshot.forEach((docSnap) => {
-          cloudLinks.push({ id: docSnap.id, ...docSnap.data() });
+          cloudLinks.push({ id: docSnap.id, category: 'General', ...docSnap.data() });
         });
         
         if (cloudLinks.length === 0) {
@@ -499,6 +536,7 @@
               uid: uid,
               name: l.name,
               url: l.url,
+              category: l.category || 'General',
               createdAt: Date.now()
             });
           }
@@ -507,12 +545,12 @@
         }
 
         links = cloudLinks;
-        renderLinks(links);
+        filterAndRender();
         updateAuthUI();
       } catch (e) {
         console.error("Error cargando de la nube:", e);
         loadLocalLinks();
-        renderLinks(links);
+        filterAndRender();
       }
     }
 
@@ -539,12 +577,42 @@
       }
     }
 
-    window.renderLinks = function(linksToRender) {
+    function renderCategoriesBar() {
+      const categories = ['Todos', ...new Set(links.map(l => l.category || 'General'))];
+      categoriesBar.innerHTML = '';
+
+      categories.forEach(cat => {
+        const chip = document.createElement('button');
+        chip.className = `category-chip ${currentCategoryFilter === cat ? 'active' : ''}`;
+        chip.innerText = cat;
+        chip.onclick = () => {
+          currentCategoryFilter = cat;
+          renderCategoriesBar();
+          filterAndRender();
+        };
+        categoriesBar.appendChild(chip);
+      });
+    }
+
+    window.filterAndRender = function() {
+      renderCategoriesBar();
+      const queryText = searchInput.value.toLowerCase();
+      
+      const filtered = links.filter(link => {
+        const matchesQuery = link.name.toLowerCase().includes(queryText) || link.url.toLowerCase().includes(queryText);
+        const matchesCategory = currentCategoryFilter === 'Todos' || (link.category || 'General') === currentCategoryFilter;
+        return matchesQuery && matchesCategory;
+      });
+
+      renderLinksGrid(filtered);
+    }
+
+    function renderLinksGrid(linksToRender) {
       linksGrid.innerHTML = '';
-      linkCountBadge.innerText = `${linksToRender.length} ${linksToRender.length === 1 ? 'enlace' : 'enlaces'}`;
+      linkCountBadge.innerText = `${links.length} ${links.length === 1 ? 'enlace' : 'enlaces'}`;
 
       if (linksToRender.length === 0) {
-        linksGrid.innerHTML = `<div class="empty-state">No se encontraron enlaces guardados.</div>`;
+        linksGrid.innerHTML = `<div class="empty-state">No se encontraron enlaces en esta categoría.</div>`;
         return;
       }
 
@@ -572,6 +640,7 @@
           <div class="link-info">
             <h3>${link.name}</h3>
             <p>${displayUrl}</p>
+            <span class="link-category-badge">${link.category || 'General'}</span>
           </div>
         `;
         linksGrid.appendChild(card);
@@ -581,6 +650,7 @@
     window.saveLink = async () => {
       const nameInput = document.getElementById('linkName');
       let urlInput = document.getElementById('linkUrl').value.trim();
+      const categoryInput = document.getElementById('linkCategory').value.trim() || 'General';
       const name = nameInput.value.trim();
 
       if (!name || !urlInput) return;
@@ -588,7 +658,7 @@
 
       if (currentUser) {
         try {
-          const newLink = { uid: currentUser.uid, name: name, url: urlInput, createdAt: Date.now() };
+          const newLink = { uid: currentUser.uid, name: name, url: urlInput, category: categoryInput, createdAt: Date.now() };
           const docRef = await addDoc(collection(db, "links"), newLink);
           links.unshift({ id: docRef.id, ...newLink });
         } catch (e) {
@@ -596,7 +666,7 @@
           return;
         }
       } else {
-        const newLink = { id: Date.now().toString(), name: name, url: urlInput };
+        const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput };
         links.unshift(newLink);
         saveLocalLinks();
       }
@@ -605,7 +675,7 @@
       document.getElementById('linkUrl').value = '';
       toggleModal();
       searchInput.value = '';
-      renderLinks(links);
+      filterAndRender();
       showToast("Enlace guardado con éxito");
     };
 
@@ -624,7 +694,7 @@
           links = links.filter(link => link.id !== id);
           saveLocalLinks();
         }
-        filterLinks();
+        filterAndRender();
         showToast("Enlace eliminado");
       }
     };
@@ -634,14 +704,6 @@
       navigator.clipboard.writeText(url).then(() => {
         showToast("¡Enlace copiado al portapapeles!");
       });
-    };
-
-    window.filterLinks = () => {
-      const queryText = searchInput.value.toLowerCase();
-      const filtered = links.filter(link => 
-        link.name.toLowerCase().includes(queryText) || link.url.toLowerCase().includes(queryText)
-      );
-      renderLinks(filtered);
     };
 
     window.toggleModal = () => {
@@ -662,7 +724,6 @@
       }, 2500);
     }
 
-    // Bloqueo total de zoom gestual (Pellizco) en móviles modernos y navegadores
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('touchmove', (event) => {
       if (event.scale && event.scale !== 1) event.preventDefault();
@@ -683,14 +744,16 @@
         </div>
         <div class="header-actions">
           <button class="btn-primary" onclick="toggleModal()">+ Agregar Enlace</button>
-          <div id="authContainer">
-            <!-- Se carga dinámicamente el estado de Google -->
-          </div>
+          <div id="authContainer"></div>
         </div>
       </div>
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." autocomplete="off" oninput="filterLinks()">
+
+      <div class="controls-container">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Buscar por nombre o URL..." autocomplete="off" oninput="filterAndRender()">
+        </div>
+        <div class="categories-bar" id="categoriesBar"></div>
       </div>
     </header>
 
@@ -699,17 +762,26 @@
     </main>
   </div>
 
-  <!-- MODAL DE NUEVO ENLACE -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
       <h2>Agregar Nuevo Enlace</h2>
       <div class="input-group">
         <label>Nombre del sitio</label>
-        <input type="text" id="linkName" placeholder="Ej. GitHub / Documentación" autocomplete="off">
+        <input type="text" id="linkName" placeholder="Ej. GitHub / KDP" autocomplete="off">
       </div>
       <div class="input-group">
         <label>Dirección URL</label>
         <input type="url" id="linkUrl" placeholder="Ej. github.com" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>Categoría</label>
+        <input type="text" id="linkCategory" list="defaultCategories" placeholder="Ej. Trabajo, Herramientas, Lectura..." autocomplete="off">
+        <datalist id="defaultCategories">
+          <option value="Trabajo"></option>
+          <option value="Herramientas"></option>
+          <option value="Lectura"></option>
+          <option value="Personal"></option>
+        </datalist>
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="toggleModal()">Cancelar</button>
@@ -718,7 +790,6 @@
     </div>
   </div>
 
-  <!-- NOTIFICACIÓN TOAST -->
   <div id="toast"></div>
 
 </body>
