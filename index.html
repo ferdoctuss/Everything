@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,6 +7,9 @@
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
   <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+
+  <!-- Librería pdf-lib para manipulación local de PDFs -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
   <style>
     :root {
@@ -110,7 +112,7 @@
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
     }
 
     .home-card {
@@ -241,6 +243,79 @@
       background: var(--bg-base); color: var(--text-main); font-size: 0.95rem; outline: none; cursor: pointer; transition: var(--transition);
     }
     .converter-select:focus { border-color: var(--border-focus); }
+
+    /* Estilos PDF Factory */
+    .pdf-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg-base);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .pdf-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .pdf-tab.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .pdf-subview { display: none; text-align: left; }
+    .pdf-subview.active { display: block; }
+    
+    .file-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+    }
+
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 10px;
+      margin: 15px 0;
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 10px;
+      background: var(--bg-base);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .page-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 6px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+    .page-chip.delete {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--danger);
+      color: var(--danger);
+      text-decoration: line-through;
+    }
 
     header.links-header {
       width: 100%;
@@ -431,6 +506,12 @@
         <h3>Convertidor</h3>
         <span>Convierte formatos de imágenes de forma local y segura.</span>
       </div>
+
+      <div class="home-card" onclick="switchView('pdf-factory')">
+        <div class="home-card-icon">📄</div>
+        <h3>PDF Factory</h3>
+        <span>Unir, eliminar páginas y proteger tus documentos PDF al instante.</span>
+      </div>
     </div>
   </section>
 
@@ -562,6 +643,82 @@
           Convertir y Descargar
         </button>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= VISTA 6: PDF FACTORY ================= -->
+  <section class="view-section" id="view-pdf-factory">
+    <button class="back-home-btn" onclick="switchView('home')">
+      ← Volver al Home
+    </button>
+
+    <div class="app-container">
+      <h2>PDF Factory</h2>
+      <p>Procesa y edita tus archivos PDF localmente sin subir tus datos a ningún servidor.</p>
+
+      <div class="pdf-tabs">
+        <button class="pdf-tab active" onclick="switchPdfTool('merge')">🔗 Unir PDFs</button>
+        <button class="pdf-tab" onclick="switchPdfTool('delete')">✂️ Eliminar Hojas</button>
+        <button class="pdf-tab" onclick="switchPdfTool('protect')">🔒 Proteger</button>
+      </div>
+
+      <!-- SUBHERRAMIENTA 1: UNIR PDF -->
+      <div class="pdf-subview active" id="pdfTool-merge">
+        <label class="dropzone">
+          <input type="file" id="pdfMergeInput" accept="application/pdf" multiple onchange="handleMergeFiles(event)">
+          <div class="dropzone-text">
+            📁 <strong>Haz clic para agregar PDFs</strong> o arrástralos aquí
+          </div>
+        </label>
+
+        <div id="pdfMergeList"></div>
+
+        <button class="btn-app-action" id="btnMergeAction" style="display:none; margin-top:15px;" onclick="processMergePdf()">
+          Unir Archivos PDF y Descargar
+        </button>
+      </div>
+
+      <!-- SUBHERRAMIENTA 2: ELIMINAR HOJAS -->
+      <div class="pdf-subview" id="pdfTool-delete">
+        <label class="dropzone">
+          <input type="file" id="pdfDeleteInput" accept="application/pdf" onchange="handleDeleteFileInput(event)">
+          <div class="dropzone-text">
+            📁 <strong>Selecciona el PDF</strong> para editar sus páginas
+          </div>
+        </label>
+
+        <div id="pdfDeleteContainer" style="display:none;">
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Haz clic en el número de página que deseas **ELIMINAR** (quedará marcada en rojo):</p>
+          
+          <div class="pages-grid" id="pagesGrid"></div>
+
+          <button class="btn-app-action" style="margin-top:15px;" onclick="processDeletePages()">
+            Generar PDF sin Páginas Seleccionadas
+          </button>
+        </div>
+      </div>
+
+      <!-- SUBHERRAMIENTA 3: PROTEGER PDF -->
+      <div class="pdf-subview" id="pdfTool-protect">
+        <label class="dropzone">
+          <input type="file" id="pdfProtectInput" accept="application/pdf" onchange="handleProtectFileInput(event)">
+          <div class="dropzone-text">
+            📁 <strong>Selecciona el PDF</strong> a proteger con contraseña
+          </div>
+        </label>
+
+        <div id="pdfProtectContainer" style="display:none;">
+          <div class="input-group">
+            <label>Contraseña de Seguridad</label>
+            <input type="password" id="pdfProtectPassword" placeholder="Escribe la clave para abrir el PDF">
+          </div>
+
+          <button class="btn-app-action" style="margin-top:10px;" onclick="processProtectPdf()">
+            Proteger PDF y Descargar
+          </button>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -1094,6 +1251,175 @@
       reader.readAsDataURL(converterFile);
     };
 
+    /* ================= LÓGICA DE PDF FACTORY ================= */
+    let mergePdfFiles = [];
+    let deletePdfFile = null;
+    let deletePdfDoc = null;
+    let pagesToDelete = new Set();
+    let protectPdfFile = null;
+
+    window.switchPdfTool = function(toolId) {
+      document.querySelectorAll('.pdf-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.pdf-subview').forEach(v => v.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`pdfTool-${toolId}`).classList.add('active');
+    };
+
+    /* 1. Unir PDFs */
+    window.handleMergeFiles = function(e) {
+      const files = Array.from(e.target.files);
+      if(!files.length) return;
+      mergePdfFiles = mergePdfFiles.concat(files);
+      renderMergeList();
+    };
+
+    function renderMergeList() {
+      const container = document.getElementById('pdfMergeList');
+      container.innerHTML = '';
+      
+      mergePdfFiles.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'file-list-item';
+        item.innerHTML = `<span>📄 ${file.name}</span> <button class="btn-card-action btn-delete" onclick="removeMergeFile(${index})">✕</button>`;
+        container.appendChild(item);
+      });
+
+      document.getElementById('btnMergeAction').style.display = mergePdfFiles.length >= 2 ? 'block' : 'none';
+    }
+
+    window.removeMergeFile = function(index) {
+      mergePdfFiles.splice(index, 1);
+      renderMergeList();
+    };
+
+    window.processMergePdf = async function() {
+      if(mergePdfFiles.length < 2) return;
+      try {
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        for (const file of mergePdfFiles) {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+        }
+        const pdfBytes = await mergedPdf.save();
+        downloadPdfBytes(pdfBytes, `pdf-unido-${Date.now()}.pdf`);
+        window.showToast("¡PDFs unidos con éxito!");
+      } catch (err) {
+        alert("Error al procesar los PDFs. Asegúrate de que no tengan protección por contraseña.");
+      }
+    };
+
+    /* 2. Eliminar Páginas */
+    window.handleDeleteFileInput = async function(e) {
+      const file = e.target.files[0];
+      if(!file) return;
+      deletePdfFile = file;
+      pagesToDelete.clear();
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        deletePdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        const pageCount = deletePdfDoc.getPageCount();
+
+        const grid = document.getElementById('pagesGrid');
+        grid.innerHTML = '';
+
+        for (let i = 0; i < pageCount; i++) {
+          const chip = document.createElement('div');
+          chip.className = 'page-chip';
+          chip.innerText = i + 1;
+          chip.onclick = () => togglePageDelete(i, chip);
+          grid.appendChild(chip);
+        }
+
+        document.getElementById('pdfDeleteContainer').style.display = 'block';
+      } catch (err) {
+        alert("Error al cargar el PDF.");
+      }
+    };
+
+    function togglePageDelete(pageIndex, chip) {
+      if (pagesToDelete.has(pageIndex)) {
+        pagesToDelete.delete(pageIndex);
+        chip.classList.remove('delete');
+      } else {
+        pagesToDelete.add(pageIndex);
+        chip.classList.add('delete');
+      }
+    }
+
+    window.processDeletePages = async function() {
+      if(!deletePdfDoc) return;
+      try {
+        const pageCount = deletePdfDoc.getPageCount();
+        if (pagesToDelete.size >= pageCount) {
+          alert("No puedes eliminar todas las páginas del PDF.");
+          return;
+        }
+
+        const newPdf = await PDFLib.PDFDocument.create();
+        const pagesToKeep = [];
+
+        for (let i = 0; i < pageCount; i++) {
+          if (!pagesToDelete.has(i)) {
+            pagesToKeep.push(i);
+          }
+        }
+
+        const copiedPages = await newPdf.copyPages(deletePdfDoc, pagesToKeep);
+        copiedPages.forEach((page) => newPdf.addPage(page));
+
+        const pdfBytes = await newPdf.save();
+        downloadPdfBytes(pdfBytes, `pdf-editado-${Date.now()}.pdf`);
+        window.showToast("¡Páginas eliminadas con éxito!");
+      } catch (err) {
+        alert("Error al procesar el archivo.");
+      }
+    };
+
+    /* 3. Proteger PDF */
+    window.handleProtectFileInput = function(e) {
+      const file = e.target.files[0];
+      if(!file) return;
+      protectPdfFile = file;
+      document.getElementById('pdfProtectContainer').style.display = 'block';
+    };
+
+    window.processProtectPdf = async function() {
+      const pass = document.getElementById('pdfProtectPassword').value.trim();
+      if(!protectPdfFile || !pass) {
+        alert("Por favor ingresa una contraseña.");
+        return;
+      }
+
+      try {
+        const arrayBuffer = await protectPdfFile.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        
+        // Cifrado directo usando las herramientas nativas de pdf-lib
+        const pdfBytes = await pdfDoc.save({
+          userPassword: pass,
+          ownerPassword: pass
+        });
+
+        downloadPdfBytes(pdfBytes, `pdf-protegido-${Date.now()}.pdf`);
+        window.showToast("¡PDF protegido con éxito!");
+      } catch (err) {
+        alert("No se pudo proteger el archivo.");
+      }
+    };
+
+    /* Descargar Bytes de PDF */
+    function downloadPdfBytes(bytes, filename) {
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
     document.addEventListener('click', e => {
       const corner = document.getElementById('accountCorner');
       if (corner && !corner.contains(e.target)) {
@@ -1104,5 +1430,3 @@
   </script>
 </body>
 </html>
-
-```
