@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>PocketHub Suite — Centro de Herramientas</title>
   
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+  <link rel="icon" type="image/png" href="Logotipo P.png">
+  <link rel="apple-touch-icon" href="Logotipo P.png">
 
   <!-- Librería pdf-lib para manipulación local de PDFs -->
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -66,7 +66,7 @@
     }
 
     .back-home-btn {
-      position: fixed;
+      position: absolute;
       top: 20px;
       left: 20px;
       z-index: 100;
@@ -95,6 +95,7 @@
       flex-direction: column;
       align-items: center;
       animation: fadeIn 0.3s ease;
+      position: relative;
     }
     .view-section.active { display: flex; }
 
@@ -135,21 +136,42 @@
       transform: translateY(-4px);
     }
 
-    .home-card-icon {
-      width: 50px;
-      height: 50px;
+    .app-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .app-card-icon {
+      width: 44px;
+      height: 44px;
       background: rgba(99, 102, 241, 0.1);
       border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 14px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: var(--accent);
+      flex-shrink: 0;
     }
 
-    .home-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
-    .home-card span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
+    .app-card-title-group {
+      text-align: left;
+      overflow: hidden;
+    }
+    .app-card-title-group h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-card-title-group span { font-size: 0.75rem; color: var(--text-muted); display: block; }
+
+    .home-card p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      text-align: left;
+      width: 100%;
+    }
 
     .app-container {
       width: 100%;
@@ -244,7 +266,6 @@
     }
     .converter-select:focus { border-color: var(--border-focus); }
 
-    /* Estilos PDF Factory */
     .pdf-tabs {
       display: flex;
       gap: 8px;
@@ -339,7 +360,6 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-left: 50px;
     }
 
     .brand-icon {
@@ -348,9 +368,10 @@
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      flex-shrink: 0;
     }
 
-    .brand-info h1 { font-size: 1.3rem; font-weight: 700; }
+    .brand-info h1 { font-size: 1.3rem; font-weight: 700; line-height: 1.2; }
     .brand-info span { font-size: 0.78rem; color: var(--text-muted); }
 
     .header-actions { 
@@ -484,33 +505,58 @@
 
     <div class="home-cards-grid">
       <div class="home-card" onclick="switchView('links')">
-        <div class="home-card-icon">🔗</div>
-        <h3>Mis Enlaces</h3>
-        <span>Gestiona tus baúles públicos y privados con acceso seguro.</span>
+        <div class="app-card-header">
+          <div class="app-card-icon">🔗</div>
+          <div class="app-card-title-group">
+            <h3>Mis Enlaces</h3>
+            <span>Baúl de lectura</span>
+          </div>
+        </div>
+        <p>Gestiona tus baúles públicos y privados con acceso seguro.</p>
       </div>
 
       <div class="home-card" onclick="switchView('metadata')">
-        <div class="home-card-icon">🖼️</div>
-        <h3>Limpiador de IA</h3>
-        <span>Quita metadatos EXIF de tus fotos manteniendo calidad original.</span>
+        <div class="app-card-header">
+          <div class="app-card-icon">🖼️</div>
+          <div class="app-card-title-group">
+            <h3>Limpiador de IA</h3>
+            <span>EXIF Cleaner</span>
+          </div>
+        </div>
+        <p>Quita metadatos EXIF de tus fotos manteniendo calidad original.</p>
       </div>
 
       <div class="home-card" onclick="switchView('comparator')">
-        <div class="home-card-icon">⚖️</div>
-        <h3>Comparador</h3>
-        <span>Compara textos o números de forma rápida y exacta.</span>
+        <div class="app-card-header">
+          <div class="app-card-icon">⚖️</div>
+          <div class="app-card-title-group">
+            <h3>Comparador</h3>
+            <span>Verificador de datos</span>
+          </div>
+        </div>
+        <p>Compara textos o números de forma rápida y exacta.</p>
       </div>
       
       <div class="home-card" onclick="switchView('converter')">
-        <div class="home-card-icon">🔄</div>
-        <h3>Convertidor</h3>
-        <span>Convierte formatos de imágenes de forma local y segura.</span>
+        <div class="app-card-header">
+          <div class="app-card-icon">🔄</div>
+          <div class="app-card-title-group">
+            <h3>Convertidor</h3>
+            <span>Transformador de imagen</span>
+          </div>
+        </div>
+        <p>Convierte formatos de imágenes de forma local y segura.</p>
       </div>
 
       <div class="home-card" onclick="switchView('pdf-factory')">
-        <div class="home-card-icon">📄</div>
-        <h3>PDF Factory</h3>
-        <span>Unir, eliminar páginas y proteger tus documentos PDF al instante.</span>
+        <div class="app-card-header">
+          <div class="app-card-icon">📄</div>
+          <div class="app-card-title-group">
+            <h3>PDF Factory</h3>
+            <span>Gestor documental</span>
+          </div>
+        </div>
+        <p>Unir, eliminar páginas y proteger tus documentos PDF al instante.</p>
       </div>
     </div>
   </section>
@@ -688,7 +734,7 @@
         </label>
 
         <div id="pdfDeleteContainer" style="display:none;">
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Haz clic en el número de página que deseas **ELIMINAR** (quedará marcada en rojo):</p>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Haz clic en el número de página que deseas <strong>ELIMINAR</strong> (quedará marcada en rojo):</p>
           
           <div class="pages-grid" id="pagesGrid"></div>
 
@@ -1108,6 +1154,33 @@
 
   <!-- GENERAL INTERFACE & UTILITIES SCRIPT -->
   <script>
+    // ================= INTEGRACIÓN DE API GROQ (LLAMA) CON FALLBACK =================
+    window.callGroqAI = async function(messages, apiKey) {
+      const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+      for (const model of models) {
+        try {
+          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: messages
+            })
+          });
+          if (response.ok) {
+            const data = await response.json();
+            return data.choices[0].message.content;
+          }
+        } catch (e) {
+          console.warn(`Modelo ${model} no disponible, intentando respaldo...`);
+        }
+      }
+      throw new Error('Todos los modelos de respaldo de Groq fallaron o la API Key es inválida.');
+    };
+
     window.copyUrl = function(event, url) {
       event.preventDefault();
       navigator.clipboard.writeText(url).then(() => { window.showToast("¡Enlace copiado!"); });
@@ -1251,7 +1324,6 @@
       reader.readAsDataURL(converterFile);
     };
 
-    /* ================= LÓGICA DE PDF FACTORY ================= */
     let mergePdfFiles = [];
     let deletePdfFile = null;
     let deletePdfDoc = null;
@@ -1266,7 +1338,6 @@
       document.getElementById(`pdfTool-${toolId}`).classList.add('active');
     };
 
-    /* 1. Unir PDFs */
     window.handleMergeFiles = function(e) {
       const files = Array.from(e.target.files);
       if(!files.length) return;
@@ -1307,11 +1378,10 @@
         downloadPdfBytes(pdfBytes, `pdf-unido-${Date.now()}.pdf`);
         window.showToast("¡PDFs unidos con éxito!");
       } catch (err) {
-        alert("Error al procesar los PDFs. Asegúrate de que no tengan protección por contraseña.");
+        alert("Error al procesar los PDFs.");
       }
     };
 
-    /* 2. Eliminar Páginas */
     window.handleDeleteFileInput = async function(e) {
       const file = e.target.files[0];
       if(!file) return;
@@ -1379,7 +1449,6 @@
       }
     };
 
-    /* 3. Proteger PDF */
     window.handleProtectFileInput = function(e) {
       const file = e.target.files[0];
       if(!file) return;
@@ -1398,7 +1467,6 @@
         const arrayBuffer = await protectPdfFile.arrayBuffer();
         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
         
-        // Cifrado directo usando las herramientas nativas de pdf-lib
         const pdfBytes = await pdfDoc.save({
           userPassword: pass,
           ownerPassword: pass
@@ -1411,7 +1479,6 @@
       }
     };
 
-    /* Descargar Bytes de PDF */
     function downloadPdfBytes(bytes, filename) {
       const blob = new Blob([bytes], { type: 'application/pdf' });
       const link = document.createElement('a');
