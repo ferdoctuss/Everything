@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -62,7 +63,6 @@
       padding-bottom: 50px;
     }
 
-    /* Botón flotante para volver al Home */
     .back-home-btn {
       position: fixed;
       top: 20px;
@@ -85,7 +85,6 @@
     }
     .back-home-btn:hover { border-color: var(--border-focus); background: var(--bg-card); }
 
-    /* --- CONTENEDORES DE VISTAS --- */
     .view-section {
       width: 100%;
       max-width: 1100px;
@@ -97,7 +96,6 @@
     }
     .view-section.active { display: flex; }
 
-    /* --- VISTA HOME --- */
     .home-header {
       text-align: center;
       max-width: 720px;
@@ -107,7 +105,6 @@
     .home-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; }
     .home-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; }
 
-    /* Tarjetas de aplicaciones en Grid (ahora son 4) */
     .home-cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -152,7 +149,6 @@
     .home-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
     .home-card span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
 
-    /* --- CONTENEDORES DE APPS (Comparador, Metadatos, Convertidor) --- */
     .app-container {
       width: 100%;
       max-width: 700px;
@@ -166,7 +162,6 @@
     .app-container h2 { font-size: 1.4rem; margin-bottom: 8px; font-weight: 700; }
     .app-container p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.4; }
 
-    /* Estilos del Comparador */
     .comparator-inputs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -194,7 +189,6 @@
     .result-card.match { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--success); }
     .result-card.nomatch { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); }
 
-    /* Dropzone (Usado en Metadatos y Convertidor) */
     .dropzone {
       border: 2px dashed var(--border);
       background: var(--bg-base);
@@ -217,7 +211,6 @@
     }
     .preview-box img { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-    /* Botón Universal App */
     .btn-app-action {
       background: linear-gradient(135deg, #6366f1, #4f46e5);
       color: #ffffff;
@@ -241,7 +234,6 @@
       box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
     }
 
-    /* Convertidor Especifico */
     .converter-select-wrap { text-align: left; margin: 15px 0; }
     .converter-select-wrap label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
     .converter-select { 
@@ -250,7 +242,6 @@
     }
     .converter-select:focus { border-color: var(--border-focus); }
 
-    /* --- VISTA ENLACES (ESTILO POCKET) --- */
     header.links-header {
       width: 100%;
       padding: 10px 0 20px 0;
@@ -352,7 +343,6 @@
     .link-category-badge { background: var(--bg-base); border: 1px solid var(--border); padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
     .private-tag { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
 
-    /* Modales generales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
@@ -391,7 +381,6 @@
     .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); font-size: 0.95rem; grid-column: 1 / -1; background: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Cuenta compacta y fijados */
     .account-corner{position:fixed;top:14px;right:18px;z-index:300}
     .account-trigger{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:40px;padding:5px 9px;cursor:pointer;color:var(--text-main);box-shadow:var(--shadow)}
     .account-trigger img{width:32px;height:32px;border-radius:50%;object-fit:cover}
@@ -407,19 +396,17 @@
       .home-header{padding:0 10px;}
     }
   </style>
-
 </head>
 <body>
   <div class="account-corner" id="accountCorner"></div>
 
-  <!-- ================= VISTA 1: HOME (PÁGINA PRINCIPAL) ================= -->
+  <!-- ================= VISTA 1: HOME ================= -->
   <section class="view-section active" id="view-home">
     <div class="home-header">
       <h1>PocketHub Suite</h1>
       <p>Tu centro multifuncional personal. Selecciona la herramienta que deseas utilizar:</p>
     </div>
 
-    <!-- TARJETAS DE APLICACIONES INDEPENDIENTES (AHORA 4) -->
     <div class="home-cards-grid">
       <div class="home-card" onclick="switchView('links')">
         <div class="home-card-icon">🔗</div>
@@ -553,10 +540,10 @@
 
     <div class="app-container">
       <h2>Convertidor Universal</h2>
-      <p>Convierte formatos de imagen al instante sin conexión. Soporta transformaciones directas entre JPG, PNG, WEBP y SVG.</p>
+      <p>Convierte formatos de imagen al instante sin conexión. Soporta transformaciones directas entre JPG, PNG, WEBP, BMP e ICO.</p>
       
       <label class="dropzone" id="converterDropzone">
-        <input type="file" id="converterInput" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="handleConverterUpload(event)">
+        <input type="file" id="converterInput" accept=".jpg,.jpeg,.png,.webp,.svg,.bmp,.ico,.gif" onchange="handleConverterUpload(event)">
         <div class="dropzone-text">
           📁 <strong>Haz clic para seleccionar</strong> o arrastra tu archivo aquí
         </div>
@@ -578,8 +565,7 @@
     </div>
   </section>
 
-
-  <!-- MODAL DE INGRESO DE PIN PRIVADO -->
+  <!-- MODAL PIN PRIVADO -->
   <div class="modal-overlay" id="pinModal">
     <div class="modal">
       <h2>Acceso Privado</h2>
@@ -595,7 +581,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE NUEVO ENLACE -->
+  <!-- MODAL NUEVO ENLACE -->
   <div class="modal-overlay" id="addModal" onclick="closeModalOutside(event)">
     <div class="modal">
       <h2>Guardar Nuevo Enlace</h2>
@@ -632,7 +618,7 @@
 
   <div id="toast"></div>
 
-  <!-- Script Principal de Lógica Firebase -->
+  <!-- FIREBASE & LOGIC SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -963,7 +949,7 @@
     } catch (e) { console.error(e); }
   </script>
 
-  <!-- Script de Interfaz Global y Herramientas Independientes -->
+  <!-- GENERAL INTERFACE & UTILITIES SCRIPT -->
   <script>
     window.copyUrl = function(event, url) {
       event.preventDefault();
@@ -992,7 +978,6 @@
       window.scrollTo(0, 0);
     }
 
-    /* Comparador Lógica */
     window.compareTexts = function() {
       const t1 = document.getElementById('compareText1').value;
       const t2 = document.getElementById('compareText2').value;
@@ -1008,7 +993,6 @@
       }
     }
 
-    /* Limpiador de Metadatos Lógica */
     window.handleImageUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1045,7 +1029,6 @@
       reader.readAsDataURL(file);
     }
 
-    /* Convertidor Lógica (Solo lo 100% posible vía Cliente) */
     let converterFile = null;
 
     window.handleConverterUpload = function(event) {
@@ -1053,33 +1036,21 @@
       if (!file) return;
       converterFile = file;
       
-      const type = file.type;
       const select = document.getElementById('converterFormat');
       select.innerHTML = '';
       
-      const options = [];
-      
-      if (type === 'image/jpeg' || type === 'image/jpg') {
-        options.push({val: 'image/png', text: 'Convertir a PNG'});
-        options.push({val: 'image/webp', text: 'Convertir a WEBP'});
-      } else if (type === 'image/png') {
-        options.push({val: 'image/jpeg', text: 'Convertir a JPG'});
-        options.push({val: 'image/webp', text: 'Convertir a WEBP'});
-        options.push({val: 'image/x-icon', text: 'Convertir a ICO'});
-      } else if (type === 'image/webp') {
-        options.push({val: 'image/jpeg', text: 'Convertir a JPG'});
-        options.push({val: 'image/png', text: 'Convertir a PNG'});
-      } else if (type === 'image/svg+xml') {
-        options.push({val: 'image/png', text: 'Convertir a PNG'});
-        options.push({val: 'image/jpeg', text: 'Convertir a JPG'});
-      } else {
-        window.showToast("Formato de imagen no soportado.");
-        return;
-      }
+      const options = [
+        { val: 'image/png', text: 'Convertir a PNG' },
+        { val: 'image/jpeg', text: 'Convertir a JPG' },
+        { val: 'image/webp', text: 'Convertir a WEBP' },
+        { val: 'image/bmp', text: 'Convertir a BMP' },
+        { val: 'image/x-icon', text: 'Convertir a ICO' }
+      ];
 
       options.forEach(opt => {
         const el = document.createElement('option');
-        el.value = opt.val; el.textContent = opt.text;
+        el.value = opt.val; 
+        el.textContent = opt.text;
         select.appendChild(el);
       });
       
@@ -1093,6 +1064,7 @@
       let ext = targetType.split('/')[1];
       if (ext === 'jpeg') ext = 'jpg';
       if (ext === 'x-icon') ext = 'ico';
+      if (ext === 'bmp') ext = 'bmp';
 
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -1103,7 +1075,7 @@
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
           
-          if (targetType === 'image/jpeg') {
+          if (targetType === 'image/jpeg' || targetType === 'image/bmp') {
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
@@ -1132,3 +1104,5 @@
   </script>
 </body>
 </html>
+
+```
