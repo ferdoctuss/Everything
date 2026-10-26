@@ -1329,7 +1329,7 @@
       }
 
       // Usamos los modelos más estables y rápidos de Groq
-      const models = ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768'];
+      const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
       let lastError = "Fallo desconocido.";
 
       for (const model of models) {
@@ -1337,7 +1337,7 @@
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${keyToUse.trim()}`, // .trim() evita espacios accidentales
+              'Authorization': `Bearer ${keyToUse.trim()}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -1346,13 +1346,12 @@
             })
           });
 
-          // Si Groq devuelve un error (ej. API Key inválida), lo capturamos como en tu app Paul
           if (!response.ok) {
             const errData = await response.json();
+            // Lanza el error EXACTO que Groq nos devuelve
             throw new Error(errData.error?.message || `Error HTTP ${response.status}`);
           }
 
-          // Si todo va bien, devolvemos el texto
           const data = await response.json();
           return data.choices[0].message.content;
 
@@ -1360,16 +1359,16 @@
           console.warn(`Intento con ${model} falló:`, e.message);
           lastError = e.message;
           
-          // Si el error es de autenticación, detenemos todo y avisamos al usuario inmediatamente
-          if (lastError.toLowerCase().includes('api key') || lastError.toLowerCase().includes('unauthorized') || lastError.includes('401')) {
-            throw new Error('Tu API Key de Groq es inválida o incorrecta. Por favor, reingrésala en la configuración.');
+          // Solo detenemos y alertamos de la API si el error dice expresamente invalid_api_key o 401
+          if (lastError.includes('invalid_api_key') || lastError.includes('401') || lastError.toLowerCase().includes('unauthorized')) {
+            throw new Error('Tu API Key es incorrecta o no autorizada. Por favor, reingrésala.');
           }
-          // Si es otro error, el bucle intentará con el siguiente modelo de la lista
+          // De lo contrario, intentará con el siguiente modelo en la lista
         }
       }
       
-      // Si todos los modelos fallan por otra razón (ej. Groq está caído)
-      throw new Error(`Error de Groq: ${lastError}`);
+      // Si todos fallan por otro motivo (ej. Rate limit excedido), mostramos ese error
+      throw new Error(`Detalle de Groq: ${lastError}`);
     };
 
     window.copyUrl = function(event, url) {
@@ -1713,7 +1712,8 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmac
         
         document.getElementById('humanizerResultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (error) {
-        alert("Error al humanizar: " + error.message + "\nAsegúrate de tener configurada tu API Key de Groq en la configuración.");
+        // Mostramos el error directo de la captura en vez de un texto fijo
+        alert("Atención:\n\n" + error.message);
       } finally {
         btn.innerHTML = originalBtnHtml;
         btn.disabled = false;
