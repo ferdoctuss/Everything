@@ -647,6 +647,17 @@
         </div>
         <p>Unir, eliminar páginas y proteger tus documentos PDF al instante.</p>
       </div>
+
+      <div class="home-card" onclick="switchView('humanizer')">
+        <div class="app-card-header">
+          <div class="app-card-icon">✍️</div>
+          <div class="app-card-title-group">
+            <h3>Humanizador</h3>
+            <span>Texto natural AI</span>
+          </div>
+        </div>
+        <p>Transforma textos de IA en escritos fluidos, creíbles y humanos.</p>
+      </div>
     </div>
   </section>
 
@@ -854,6 +865,39 @@
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ================= VISTA 7: HUMANIZADOR DE TEXTOS ================= -->
+  <section class="view-section" id="view-humanizer">
+    <button class="back-home-btn" onclick="switchView('home')">
+      ← Volver al Home
+    </button>
+
+    <div class="app-container">
+      <h2>Humanizador de Texto</h2>
+      <p>Pega tu texto y conviértelo en un escrito natural, sin las típicas muletillas de la Inteligencia Artificial.</p>
+      
+      <div class="comparator-inputs" style="grid-template-columns: 1fr; gap: 20px;">
+        <div class="comparator-group">
+          <label>Texto Original (IA)</label>
+          <textarea id="humanizerInput" placeholder="Pega el texto generado por IA aquí..." style="height: 150px;"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-app-action" id="humanizeBtn" onclick="humanizeText()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+        Humanizar Texto
+      </button>
+
+      <!-- Contenedor del resultado oculto por defecto -->
+      <div class="comparator-inputs" style="grid-template-columns: 1fr; gap: 20px; margin-top: 20px; display: none;" id="humanizerResultContainer">
+        <div class="comparator-group">
+          <label>Texto Humanizado</label>
+          <textarea id="humanizerOutput" readonly style="height: 250px; background: var(--bg-card); cursor: text;"></textarea>
+        </div>
+        <button class="btn-cancel" onclick="copyHumanizedText()" style="width: 100%;">📋 Copiar Resultado</button>
+      </div>
     </div>
   </section>
 
@@ -1614,6 +1658,57 @@
       link.download = filename;
       link.click();
     }
+
+    // ================= LÓGICA DEL HUMANIZADOR DE TEXTO =================
+    window.humanizeText = async function() {
+      const inputEl = document.getElementById('humanizerInput');
+      const inputText = inputEl.value.trim();
+      
+      if (!inputText) {
+        window.showToast("Por favor, ingresa el texto que deseas humanizar.");
+        return;
+      }
+
+      const btn = document.getElementById('humanizeBtn');
+      const originalBtnHtml = btn.innerHTML;
+      btn.innerHTML = '⏳ Humanizando texto...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+
+      const systemPrompt = `Tu única tarea es reescribir el texto del usuario cumpliendo ESTRICTAMENTE estas instrucciones:
+Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzcas errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
+IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmaciones y sin explicaciones adicionales.`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: inputText }
+      ];
+
+      try {
+        const humanizedResult = await window.callGroqAI(messages);
+        
+        document.getElementById('humanizerOutput').value = humanizedResult;
+        document.getElementById('humanizerResultContainer').style.display = 'block';
+        window.showToast("¡Texto humanizado con éxito!");
+        
+        document.getElementById('humanizerResultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (error) {
+        alert("Error al humanizar: " + error.message + "\nAsegúrate de tener configurada tu API Key de Groq en la configuración.");
+      } finally {
+        btn.innerHTML = originalBtnHtml;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    };
+
+    window.copyHumanizedText = function() {
+      const output = document.getElementById('humanizerOutput');
+      output.select();
+      output.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(output.value).then(() => {
+        window.showToast("¡Texto copiado al portapapeles!");
+      });
+    };
 
     document.addEventListener('click', e => {
       const configMenu = document.getElementById('configDropdownMenu');
