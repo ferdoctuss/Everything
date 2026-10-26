@@ -1321,20 +1321,23 @@
       location.reload();
     };
 
-    // ================= INTEGRACIÓN DE API GROQ (LLAMA) CON FALLBACK =================
+    // ================= INTEGRACIÓN DE API GROQ MEJORADA =================
     window.callGroqAI = async function(messages, apiKey) {
       const keyToUse = apiKey || localStorage.getItem('pockethub_groq_key');
       if (!keyToUse) {
         throw new Error('No has configurado una API Key de Groq en el menú de Configuración.');
       }
 
-      const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+      // Usamos los modelos más estables y rápidos de Groq
+      const models = ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768'];
+      let lastError = "Fallo desconocido.";
+
       for (const model of models) {
         try {
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${keyToUse}`,
+              'Authorization': `Bearer ${keyToUse.trim()}`, // .trim() evita espacios accidentales
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -1342,15 +1345,31 @@
               messages: messages
             })
           });
-          if (response.ok) {
-            const data = await response.json();
-            return data.choices[0].message.content;
+
+          // Si Groq devuelve un error (ej. API Key inválida), lo capturamos como en tu app Paul
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || `Error HTTP ${response.status}`);
           }
+
+          // Si todo va bien, devolvemos el texto
+          const data = await response.json();
+          return data.choices[0].message.content;
+
         } catch (e) {
-          console.warn(`Modelo ${model} no disponible, intentando respaldo...`);
+          console.warn(`Intento con ${model} falló:`, e.message);
+          lastError = e.message;
+          
+          // Si el error es de autenticación, detenemos todo y avisamos al usuario inmediatamente
+          if (lastError.toLowerCase().includes('api key') || lastError.toLowerCase().includes('unauthorized') || lastError.includes('401')) {
+            throw new Error('Tu API Key de Groq es inválida o incorrecta. Por favor, reingrésala en la configuración.');
+          }
+          // Si es otro error, el bucle intentará con el siguiente modelo de la lista
         }
       }
-      throw new Error('Todos los modelos de respaldo de Groq fallaron o la API Key es inválida.');
+      
+      // Si todos los modelos fallan por otra razón (ej. Groq está caído)
+      throw new Error(`Error de Groq: ${lastError}`);
     };
 
     window.copyUrl = function(event, url) {
@@ -1675,6 +1694,7 @@
       btn.disabled = true;
       btn.style.opacity = '0.7';
 
+      // Instrucciones estrictas proporcionadas para el System Prompt
       const systemPrompt = `Tu única tarea es reescribir el texto del usuario cumpliendo ESTRICTAMENTE estas instrucciones:
 Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzcas errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
 IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmaciones y sin explicaciones adicionales.`;
