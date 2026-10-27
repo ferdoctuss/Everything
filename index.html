@@ -726,7 +726,7 @@
       <label class="dropzone" id="dropzone">
         <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
         <div class="dropzone-text">
-          📁 <strong>Haz clic para seleccionar</strong> o arrastra tu foto aquí
+          📁 <strong>Haz clic para seleccionar</strong> or arrastra tu foto aquí
         </div>
       </label>
 
@@ -879,7 +879,7 @@
     </div>
   </section>
 
-<!-- ================= VISTA: CORRECTOR DE GRAMÁTICA ================= -->
+  <!-- ================= VISTA: CORRECTOR DE GRAMÁTICA ================= -->
   <section class="view-section" id="view-grammar">
     <button class="back-home-btn" onclick="switchView('home')">
       ← Volver al Home
@@ -1041,7 +1041,12 @@
       function loadLocalLinks() {
         try {
           const stored = localStorage.getItem('pockethub_links_v7');
-          links = stored ? JSON.parse(stored) : defaultLinks;
+          if (stored) {
+            links = JSON.parse(stored);
+          } else {
+            links = defaultLinks;
+            saveLocalLinks();
+          }
         } catch(e) { links = defaultLinks; }
       }
 
@@ -1098,7 +1103,11 @@
             return;
           }
 
-          links = cloudLinks;
+          // Conservamos también los enlaces privados locales que el usuario tenga guardados en su dispositivo
+          loadLocalLinks();
+          const localPrivateLinks = links.filter(l => l.isPrivate);
+          links = [...cloudLinks, ...localPrivateLinks];
+
           window.filterAndRender();
           window.updateAuthUI();
         } catch (e) {
@@ -1416,7 +1425,7 @@
       throw new Error(`Error de Groq: ${lastError}`);
     };
 
-// ================= LÓGICA DEL CORRECTOR DE GRAMÁTICA =================
+    // ================= LÓGICA DEL CORRECTOR DE GRAMÁTICA =================
     window.correctGrammarText = async function() {
       const inputEl = document.getElementById('grammarInput');
       const inputText = inputEl.value.trim();
@@ -1467,8 +1476,7 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaci
       });
     };
 
-// ================= LÓGICA DEL humanizador =================
-    
+    // ================= UTILIDADES Y NAVEGACIÓN =================
     window.copyUrl = function(event, url) {
       event.preventDefault();
       navigator.clipboard.writeText(url).then(() => { window.showToast("¡Enlace copiado!"); });
@@ -1791,7 +1799,6 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaci
       btn.disabled = true;
       btn.style.opacity = '0.7';
 
-      // Instrucciones estrictas proporcionadas para el System Prompt
       const systemPrompt = `Tu única tarea es reescribir el texto del usuario cumpliendo ESTRICTAMENTE estas instrucciones:
 Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzcas errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
 IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmaciones y sin explicaciones adicionales.`;
