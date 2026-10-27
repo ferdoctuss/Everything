@@ -169,24 +169,32 @@
       text-align: center;
       max-width: 720px;
       margin-top: 10px;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
     .home-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; }
     .home-header p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; }
 
+    /* Cuadrícula optimizada para 2 columnas en móvil y adaptable en escritorio */
     .home-cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
       width: 100%;
       max-width: 900px;
+    }
+
+    @media(min-width: 768px) {
+      .home-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
     }
 
     .home-card {
       background: var(--bg-surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px 20px;
+      padding: 16px 14px;
       text-align: center;
       cursor: pointer;
       transition: var(--transition);
@@ -194,7 +202,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
     .home-card:hover {
       border-color: var(--border-focus);
@@ -204,39 +212,79 @@
 
     .app-card-header {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    @media(min-width: 768px) {
+      .app-card-header {
+        flex-direction: row;
+        text-align: left;
+      }
     }
 
     .app-card-icon {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       background: rgba(99, 102, 241, 0.1);
       border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--accent);
       flex-shrink: 0;
     }
 
     .app-card-title-group {
-      text-align: left;
+      text-align: center;
       overflow: hidden;
+      width: 100%;
     }
-    .app-card-title-group h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .app-card-title-group span { font-size: 0.75rem; color: var(--text-muted); display: block; }
+
+    @media(min-width: 768px) {
+      .app-card-title-group {
+        text-align: left;
+      }
+    }
+
+    .app-card-title-group h3 { font-size: 0.9rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-card-title-group span { font-size: 0.7rem; color: var(--text-muted); display: block; }
 
     .home-card p {
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-      line-height: 1.3;
-      text-align: left;
+      line-height: 1.25;
+      text-align: center;
       width: 100%;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    @media(min-width: 768px) {
+      .home-card {
+        padding: 24px 20px;
+        gap: 12px;
+      }
+      .home-card p {
+        font-size: 0.82rem;
+        text-align: left;
+        display: block;
+      }
+      .app-card-icon {
+        width: 44px;
+        height: 44px;
+      }
+      .app-card-title-group h3 {
+        font-size: 1rem;
+      }
     }
 
     .app-container {
@@ -726,7 +774,7 @@
       <label class="dropzone" id="dropzone">
         <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
         <div class="dropzone-text">
-          📁 <strong>Haz clic para seleccionar</strong> or arrastra tu foto aquí
+          📁 <strong>Haz clic para seleccionar</strong> o arrastra tu foto aquí
         </div>
       </label>
 
@@ -1103,7 +1151,6 @@
             return;
           }
 
-          // Conservamos también los enlaces privados locales que el usuario tenga guardados en su dispositivo
           loadLocalLinks();
           const localPrivateLinks = links.filter(l => l.isPrivate);
           links = [...cloudLinks, ...localPrivateLinks];
@@ -1295,14 +1342,18 @@
         if (!name || !urlInput) return;
         if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-        if (window.currentUser && !isPrivateInput) {
+        if (isPrivateInput) {
+          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: true };
+          links.unshift(newLink);
+          saveLocalLinks();
+        } else if (window.currentUser) {
           try {
             const newLink = { uid: window.currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: false, createdAt: Date.now() };
             const docRef = await addDoc(collection(db, "links"), newLink);
             links.unshift({ id: docRef.id, ...newLink });
           } catch (e) { alert("Error al guardar en la nube."); return; }
         } else {
-          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput };
+          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: false };
           links.unshift(newLink);
           saveLocalLinks();
         }
@@ -1800,7 +1851,7 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaci
       btn.style.opacity = '0.7';
 
       const systemPrompt = `Tu única tarea es reescribir el texto del usuario cumpliendo ESTRICTAMENTE estas instrucciones:
-Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzcas errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
+Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzces errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
 IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmaciones y sin explicaciones adicionales.`;
 
       const messages = [
