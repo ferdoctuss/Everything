@@ -1322,15 +1322,14 @@
     };
 
     // ================= INTEGRACIÓN DE API GROQ MEJORADA =================
-   // ================= INTEGRACIÓN DE API GROQ MEJORADA =================
     window.callGroqAI = async function(messages, apiKey) {
       const keyToUse = apiKey || localStorage.getItem('pockethub_groq_key');
       if (!keyToUse) {
         throw new Error('No has configurado una API Key de Groq en el menú de Configuración.');
       }
 
-      // Modelos actualizados y activos de Groq
-      const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+      // Modelo extraído de tu app de ejemplo (Paul)
+      const models = ['openai/gpt-oss-120b'];
       let lastError = "Fallo desconocido.";
 
       for (const model of models) {
