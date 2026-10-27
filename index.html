@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>PocketHub Suite — Centro de Herramientas</title>
   
- <link rel="icon" type="image/png" href="LogotipoP.png?v=2">
-<link rel="apple-touch-icon" href="LogotipoP.png?v=2">
-<link rel="shortcut icon" href="LogotipoP.png?v=2">
+  <link rel="icon" type="image/png" href="LogotipoP.png?v=2">
+  <link rel="apple-touch-icon" href="LogotipoP.png?v=2">
+  <link rel="shortcut icon" href="LogotipoP.png?v=2">
 
   <!-- Librerías para lectura de PDF y DOCX locales -->
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -531,28 +531,108 @@
     .category-chip:hover { border-color: var(--border-focus); color: var(--text-main); }
     .category-chip.active { background: var(--text-main); color: var(--bg-base); border-color: transparent; }
 
-    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; }
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; width: 100%; }
 
+    /* Estilo de Tarjetas Tipográficas sin Iconos */
     .link-card {
-      background-color: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; transition: var(--transition); box-shadow: var(--shadow); overflow: hidden;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 140px;
     }
-    .link-card:hover { border-color: var(--border-focus); background-color: var(--bg-card-hover); transform: translateY(-4px); }
-    .link-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .link-favicon-large {
-      width: 52px; height: 52px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    
+    .link-card:hover {
+      border-color: var(--border-focus);
+      background-color: var(--bg-card-hover);
+      transform: translateY(-4px);
     }
-    .link-favicon-large img { width: 28px; height: 28px; object-fit: contain; }
-    .link-actions-group { display: flex; gap: 6px; opacity: 0; transition: var(--transition); }
-    .link-card:hover .link-actions-group { opacity: 1; }
-    .btn-card-action {
-      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: var(--transition);
-    }
-    .btn-card-action:hover { color: var(--text-main); border-color: var(--border-focus); background: var(--bg-card); }
-    .btn-delete:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.4); }
 
-    .link-info h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .link-info p { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 14px; }
-    .link-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .link-actions-group {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 10;
+    }
+    
+    .link-card:hover .link-actions-group {
+      opacity: 1;
+    }
+
+    .btn-card-action {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    
+    .btn-card-action:hover {
+      color: var(--text-main);
+      border-color: var(--border-focus);
+      background: var(--bg-card);
+    }
+    
+    .btn-delete:hover {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .link-info {
+      margin-top: 4px;
+      padding-right: 30px;
+    }
+
+    .link-info h3 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+      color: var(--text-main);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .link-info p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 14px;
+    }
+    
+    .link-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
     .link-category-badge { background: var(--bg-base); border: 1px solid var(--border); padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
     .private-tag { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
 
@@ -1277,7 +1357,6 @@
 
       async function fetchCloudLinks(uid) {
         try {
-          // Descargamos TODOS los enlaces (públicos y privados) del usuario logueado en Firebase Cloud Firestore
           const q = query(collection(db, "links"), where("uid", "==", uid));
           const querySnapshot = await getDocs(q);
           let cloudLinks = [];
@@ -1449,29 +1528,69 @@
         regular.forEach(l=>grid.appendChild(window.makeLinkCard(l)));
       }
 
+      // TARJETA DE ENLACES SIN ICONOS CON TIPOGRAFÍA DESTACADA
       window.makeLinkCard = function(link){
-        const card=document.createElement('a');card.className='link-card';
-        const safeUrl=/^https?:\/\//i.test(link.url)?link.url:'#';
-        card.href=safeUrl;card.target='_blank';card.rel='noopener noreferrer';
-        const header=document.createElement('div');header.className='link-card-header';
-        const favicon=document.createElement('div');favicon.className='link-favicon-large';
-        const img=document.createElement('img');
-        try{img.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(new URL(safeUrl).hostname)+'&sz=128'}catch(e){}
-        img.alt='';favicon.appendChild(img);
-        const actions=document.createElement('div');actions.className='link-actions-group';
-        const pin=document.createElement('button');pin.className='btn-card-action pin-action'+(window.pinnedIds.has(String(link.id))?' active':'');
-        pin.textContent=window.pinnedIds.has(String(link.id))?'📌':'📍';pin.title=window.pinnedIds.has(String(link.id))?'Desfijar':'Fijar enlace';
-        pin.onclick=e=>window.togglePin(link.id,e);
-        const copy=document.createElement('button');copy.className='btn-card-action';copy.textContent='📋';copy.title='Copiar URL';copy.onclick=e=>window.copyUrl(e,link.url);
-        const del=document.createElement('button');del.className='btn-card-action btn-delete';del.textContent='✕';del.title='Eliminar';del.onclick=e=>window.deleteLink(link.id,e);
-        actions.append(pin,copy,del);header.append(favicon,actions);
-        const info=document.createElement('div');info.className='link-info';
-        const name=document.createElement('h3');name.textContent=link.name;
-        const url=document.createElement('p');url.textContent=link.url.replace(/^https?:\/\//,'').replace(/\/$/,'');info.append(name,url);
-        const footer=document.createElement('div');footer.className='link-card-footer';
-        const category=document.createElement('span');category.className='link-category-badge';category.textContent=link.category||'General';footer.append(category);
-        if(link.isPrivate){const privateTag=document.createElement('span');privateTag.className='link-category-badge private-tag';privateTag.textContent='Privado';footer.append(privateTag)}
-        card.append(header,info,footer);return card;
+        const card = document.createElement('a');
+        card.className = 'link-card';
+        const safeUrl = /^https?:\/\//i.test(link.url) ? link.url : '#';
+        card.href = safeUrl;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+
+        // Acciones flotantes
+        const actions = document.createElement('div');
+        actions.className = 'link-actions-group';
+        
+        const pin = document.createElement('button');
+        pin.className = 'btn-card-action pin-action' + (window.pinnedIds.has(String(link.id)) ? ' active' : '');
+        pin.textContent = window.pinnedIds.has(String(link.id)) ? '📌' : '📍';
+        pin.title = window.pinnedIds.has(String(link.id)) ? 'Desfijar' : 'Fijar enlace';
+        pin.onclick = e => window.togglePin(link.id, e);
+
+        const copy = document.createElement('button');
+        copy.className = 'btn-card-action';
+        copy.textContent = '📋';
+        copy.title = 'Copiar URL';
+        copy.onclick = e => window.copyUrl(e, link.url);
+
+        const del = document.createElement('button');
+        del.className = 'btn-card-action btn-delete';
+        del.textContent = '✕';
+        del.title = 'Eliminar';
+        del.onclick = e => window.deleteLink(link.id, e);
+
+        actions.append(pin, copy, del);
+
+        // Información principal (Nombres grandes)
+        const info = document.createElement('div');
+        info.className = 'link-info';
+        
+        const name = document.createElement('h3');
+        name.textContent = link.name;
+        
+        const url = document.createElement('p');
+        url.textContent = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        
+        info.append(name, url);
+
+        // Pie de tarjeta
+        const footer = document.createElement('div');
+        footer.className = 'link-card-footer';
+        
+        const category = document.createElement('span');
+        category.className = 'link-category-badge';
+        category.textContent = link.category || 'General';
+        footer.append(category);
+
+        if (link.isPrivate) {
+          const privateTag = document.createElement('span');
+          privateTag.className = 'link-category-badge private-tag';
+          privateTag.textContent = 'Privado';
+          footer.append(privateTag);
+        }
+
+        card.append(actions, info, footer);
+        return card;
       }
 
       window.saveLink = async function() {
@@ -1485,14 +1604,12 @@
         if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
         if (window.currentUser) {
-          // Si hay sesión iniciada, guardamos tanto públicos como privados en la nube de Firebase
           try {
             const newLink = { uid: window.currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput, createdAt: Date.now() };
             const docRef = await addDoc(collection(db, "links"), newLink);
             links.unshift({ id: docRef.id, ...newLink });
           } catch (e) { alert("Error al guardar en la nube."); return; }
         } else {
-          // Si no hay sesión, se guarda localmente en el dispositivo
           const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput };
           links.unshift(newLink);
           saveLocalLinks();
@@ -1722,7 +1839,7 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaci
       btn.innerHTML = '⏳ Generando preguntas con IA...';
       btn.disabled = true;
 
-      const systemPrompt = `Eres un profesor experto creando cuestionarios de evaluación. Basándote estrictamente en el texto provisto por el usuario, genera exactamente ${count} preguntas de opción múltiple.
+      const systemPrompt = `Eres un profesor experto creando cuestionarios de evaluación. Basándote strictly en el texto provisto por el usuario, genera exactamente ${count} preguntas de opción múltiple.
 Debes responder ÚNICAMENTE en formato JSON válido (un arreglo de objetos), sin texto adicional antes ni después, sin bloques markdown como \`\`\`json.
 Estructura exacta por objeto:
 {
@@ -1796,7 +1913,6 @@ Estructura exacta por objeto:
           incorrectCount++;
         }
 
-        // Renderizamos la tarjeta de revisión para cada pregunta
         const reviewCard = document.createElement('div');
         reviewCard.className = 'quiz-question-card';
         reviewCard.style.borderLeft = isCorrect ? '4px solid var(--success)' : '4px solid var(--danger)';
@@ -2180,7 +2296,7 @@ Estructura exacta por objeto:
       btn.style.opacity = '0.7';
 
       const systemPrompt = `Tu única tarea es reescribir el texto del usuario cumpliendo ESTRICTAMENTE estas instrucciones:
-Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturalmente la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzces errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
+Escribe con naturalidad, como una persona real, no como una IA. Prioriza la claridad, la precisión y las ideas concretas. Evita clichés, grandilocuencia, lenguaje promocional, elogios exagerados y afirmaciones vagas. No abuses de palabras como «fundamental», «crucial», «pivotal», «profundizar», «destacar» o «en conclusión». Varía naturally la longitud y la estructura de las frases. Evita ritmos mecánicos, paralelismos repetitivos y la regla de tres automática. No uses introducciones genéricas, conclusiones previsibles ni resúmenes que repitan lo obvio. Evita listas, subtítulos, negritas, emojis y tablas cuando el texto fluya mejor en prosa. No fuerces sinónimos ni compliques expresiones sencillas. Usa palabras comunes cuando sean suficientes. Evita muletillas, advertencias innecesarias, tono de atención al cliente y frases prefabricadas. No inventes datos, citas, fuentes, experiencias personales ni opiniones. Distingue los hechos de las inferencias y reconoce la incertidumbre cuando corresponda. Adapta el tono, el vocabulario y el ritmo al contexto, al público y al propósito. Usa puntuación natural. No abuses de las rayas largas, los dos puntos ni los puntos y coma. Elimina repeticiones, relleno, explicaciones obvias y cualquier frase que no mejore el resultado. No introduzcas errores deliberadamente para aparentar humanidad ni sacrifiques precisión por estilo. Antes de responder, revisa mentalmente el texto y reescribe cualquier fragmento artificial, genérico o excesivamente pulido. El objetivo es producir textos creíbles, fluidos, específicos y naturales, conservando la precisión, la utilidad y la voz adecuada para cada situación.
 IMPORTANTE: Devuelve ÚNICAMENTE el texto humanizado, sin saludar, sin confirmaciones y sin explicaciones adicionales.`;
 
       const messages = [
