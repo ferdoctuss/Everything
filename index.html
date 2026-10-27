@@ -1416,6 +1416,59 @@
       throw new Error(`Error de Groq: ${lastError}`);
     };
 
+// ================= LÓGICA DEL CORRECTOR DE GRAMÁTICA =================
+    window.correctGrammarText = async function() {
+      const inputEl = document.getElementById('grammarInput');
+      const inputText = inputEl.value.trim();
+      
+      if (!inputText) {
+        window.showToast("Por favor, ingresa el texto que deseas corregir.");
+        return;
+      }
+
+      const btn = document.getElementById('grammarBtn');
+      const originalBtnHtml = btn.innerHTML;
+      btn.innerHTML = '⏳ Corrigiendo texto...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+
+      const systemPrompt = `Tu única tarea es corregir todos los errores ortográficos, de puntuación, acentuación y gramática del texto proporcionado por el usuario. 
+Mantiene el tono y estilo original del autor, limitándote estrictamente a corregir las faltas técnicas del lenguaje. No inventes información, no resumas ni agregues explicaciones adicionales.
+IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaciones y sin introducciones.`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: inputText }
+      ];
+
+      try {
+        const correctedResult = await window.callGroqAI(messages);
+        
+        document.getElementById('grammarOutput').value = correctedResult;
+        document.getElementById('grammarResultContainer').style.display = 'block';
+        window.showToast("¡Texto corregido con éxito!");
+        
+        document.getElementById('grammarResultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (error) {
+        alert("Error al corregir: " + error.message + "\nAsegúrate de tener configurada tu API Key de Groq en la configuración.");
+      } finally {
+        btn.innerHTML = originalBtnHtml;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    };
+
+    window.copyGrammarText = function() {
+      const output = document.getElementById('grammarOutput');
+      output.select();
+      output.setSelectionRange(0, 99999); 
+      navigator.clipboard.writeText(output.value).then(() => {
+        window.showToast("¡Texto copiado al portapapeles!");
+      });
+    };
+
+// ================= LÓGICA DEL humanizador =================
+    
     window.copyUrl = function(event, url) {
       event.preventDefault();
       navigator.clipboard.writeText(url).then(() => { window.showToast("¡Enlace copiado!"); });
