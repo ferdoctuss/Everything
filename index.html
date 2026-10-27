@@ -650,6 +650,14 @@
       border-color: var(--danger) !important;
       color: var(--danger);
     }
+    .quiz-explanation-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--bg-surface);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      border-left: 3px solid var(--accent);
+    }
 
     @media(max-width:650px){
       .account-trigger span{display:none}
@@ -769,7 +777,6 @@
         <p>Transforma textos de IA en escritos fluidos, creíbles y humanos.</p>
       </div>
 
-      <!-- NUEVA TARJETA: GENERADOR DE PREGUNTAS -->
       <div class="home-card" onclick="switchView('quiz')">
         <div class="app-card-header">
           <div class="app-card-icon">❓</div>
@@ -1113,13 +1120,16 @@
         </div>
       </div>
 
-      <!-- Paso 3: Resultados -->
+      <!-- Paso 3: Resultados y Revisión detallada -->
       <div id="quizResultContainer" style="display: none; text-align: left; margin-top: 20px;">
         <div id="quizScoreCard" class="result-card" style="display: block; margin-bottom: 20px;"></div>
         
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-app-action" onclick="retrySameQuiz()" style="flex: 1;">Intentar de Nuevo (Mismas)</button>
-          <button class="btn-primary" onclick="generateQuiz()" style="flex: 1; justify-content: center;">Refrescar Preguntas (Nuevas)</button>
+        <!-- Contenedor donde saldrán todas las preguntas con respuestas correctas/incorrectas -->
+        <div id="quizReviewList" style="margin-bottom: 25px;"></div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn-app-action" onclick="retrySameQuiz()" style="flex: 1; min-width: 200px;">Intentar de Nuevo (Mismas)</button>
+          <button class="btn-primary" onclick="generateQuiz()" style="flex: 1; min-width: 200px; justify-content: center;">Refrescar Preguntas (Nuevas)</button>
         </div>
         <button class="btn-cancel" onclick="resetQuizSetup()" style="width: 100%; margin-top: 10px;">Elegir otro texto / archivo</button>
       </div>
@@ -1266,6 +1276,7 @@
 
       async function fetchCloudLinks(uid) {
         try {
+          // Descargamos TODOS los enlaces (públicos y privados) del usuario logueado en Firebase Cloud Firestore
           const q = query(collection(db, "links"), where("uid", "==", uid));
           const querySnapshot = await getDocs(q);
           let cloudLinks = [];
@@ -1284,10 +1295,7 @@
             return;
           }
 
-          loadLocalLinks();
-          const localPrivateLinks = links.filter(l => l.isPrivate);
-          links = [...cloudLinks, ...localPrivateLinks];
-
+          links = cloudLinks;
           window.filterAndRender();
           window.updateAuthUI();
         } catch (e) {
@@ -1475,18 +1483,16 @@
         if (!name || !urlInput) return;
         if (!/^https?:\/\//i.test(urlInput)) urlInput = 'https://' + urlInput;
 
-        if (isPrivateInput) {
-          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: true };
-          links.unshift(newLink);
-          saveLocalLinks();
-        } else if (window.currentUser) {
+        if (window.currentUser) {
+          // Si hay sesión iniciada, guardamos tanto públicos como privados en la nube de Firebase
           try {
-            const newLink = { uid: window.currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: false, createdAt: Date.now() };
+            const newLink = { uid: window.currentUser.uid, name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput, createdAt: Date.now() };
             const docRef = await addDoc(collection(db, "links"), newLink);
             links.unshift({ id: docRef.id, ...newLink });
           } catch (e) { alert("Error al guardar en la nube."); return; }
         } else {
-          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: false };
+          // Si no hay sesión, se guarda localmente en el dispositivo
+          const newLink = { id: Date.now().toString(), name: name, url: urlInput, category: categoryInput, isPrivate: isPrivateInput };
           links.unshift(newLink);
           saveLocalLinks();
         }
@@ -1502,7 +1508,7 @@
         event.preventDefault();
         if (confirm('¿Eliminar este enlace?')) {
           const linkToDelete = links.find(l => l.id === id);
-          if (window.currentUser && linkToDelete && !linkToDelete.isPrivate) {
+          if (window.currentUser && linkToDelete) {
             try { await deleteDoc(doc(db, "links", id)); } catch(e) {}
           }
           links = links.filter(link => link.id !== id);
@@ -1518,7 +1524,6 @@
         window.filterAndRender();
         window.updateAuthUI();
         
-        // Cargar preferencia de tema guardada
         if(localStorage.getItem('pockethub_theme') === 'light') {
           document.body.classList.add('light-theme');
         }
@@ -1530,7 +1535,6 @@
 
   <!-- GENERAL INTERFACE & UTILITIES SCRIPT -->
   <script>
-    // ================= MENÚ DE CONFIGURACIÓN Y TEMA =================
     window.toggleConfigMenu = function(e) {
       e.stopPropagation();
       const menu = document.getElementById('configDropdownMenu');
@@ -1559,7 +1563,6 @@
       location.reload();
     };
 
-    // ================= INTEGRACIÓN DE API GROQ MEJORADA =================
     window.callGroqAI = async function(messages, apiKey) {
       const keyToUse = apiKey || localStorage.getItem('pockethub_groq_key');
       if (!keyToUse) {
@@ -1604,7 +1607,6 @@
       throw new Error(`Error de Groq: ${lastError}`);
     };
 
-    // ================= LÓGICA DEL CORRECTOR DE GRAMÁTICA =================
     window.correctGrammarText = async function() {
       const inputEl = document.getElementById('grammarInput');
       const inputText = inputEl.value.trim();
@@ -1735,7 +1737,6 @@ Estructura exacta por objeto:
 
       try {
         const responseJsonStr = await window.callGroqAI(messages);
-        // Limpiamos posibles bloques markdown si los hubiera
         const cleanJson = responseJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
         currentQuizData = JSON.parse(cleanJson);
 
@@ -1762,7 +1763,6 @@ Estructura exacta por objeto:
         card.dataset.index = qIndex;
 
         let optionsHtml = '';
-        // Mezclamos o mostramos las alternativas
         q.alternativas.forEach((alt, aIndex) => {
           optionsHtml += `
             <label class="quiz-option-label" id="q${qIndex}_opt${aIndex}">
@@ -1782,29 +1782,55 @@ Estructura exacta por objeto:
 
     window.evaluateQuiz = function() {
       let incorrectCount = 0;
-      let totalAnswered = 0;
+      const reviewContainer = document.getElementById('quizReviewList');
+      reviewContainer.innerHTML = '<h3 style="font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Revisión detallada de respuestas:</h3>';
 
       currentQuizData.forEach((q, qIndex) => {
         const selectedRadio = document.querySelector(`input[name="question_${qIndex}"]:checked`);
-        const optionsList = document.querySelectorAll(`input[name="question_${qIndex}"]`);
+        const userValue = selectedRadio ? selectedRadio.value.trim() : null;
+        const correctValue = q.respuestaCorrecta.trim();
+        const isCorrect = userValue === correctValue;
 
-        optionsList.forEach(radio => {
-          const label = radio.closest('.quiz-option-label');
-          label.classList.remove('correct-answer', 'wrong-answer');
-          if (radio.value.trim() === q.respuestaCorrecta.trim()) {
-            label.classList.add('correct-answer');
+        if (!isCorrect) {
+          incorrectCount++;
+        }
+
+        // Renderizamos la tarjeta de revisión para cada pregunta
+        const reviewCard = document.createElement('div');
+        reviewCard.className = 'quiz-question-card';
+        reviewCard.style.borderLeft = isCorrect ? '4px solid var(--success)' : '4px solid var(--danger)';
+
+        let optionsReviewHtml = '';
+        q.alternativas.forEach((alt) => {
+          const isThisCorrect = alt.trim() === correctValue;
+          const isThisUserSelected = alt.trim() === userValue;
+
+          let optionClass = 'quiz-option-label';
+          let badgeText = '';
+
+          if (isThisCorrect) {
+            optionClass += ' correct-answer';
+            badgeText = ' ✓ (Correcta)';
           }
+          if (isThisUserSelected && !isThisCorrect) {
+            optionClass += ' wrong-answer';
+            badgeText = ' ✕ (Tu respuesta)';
+          } else if (isThisUserSelected && isThisCorrect) {
+            badgeText = ' ✓ (Tu respuesta)';
+          }
+
+          optionsReviewHtml += `
+            <div class="${optionClass}" style="cursor: default;">
+              <span>${alt} <strong>${badgeText}</strong></span>
+            </div>
+          `;
         });
 
-        if (selectedRadio) {
-          totalAnswered++;
-          if (selectedRadio.value.trim() !== q.respuestaCorrecta.trim()) {
-            incorrectCount++;
-            selectedRadio.closest('.quiz-option-label').classList.add('wrong-answer');
-          }
-        } else {
-          incorrectCount++; // Si no marcó nada cuenta como fallo
-        }
+        reviewCard.innerHTML = `
+          <h4>${qIndex + 1}. ${q.pregunta}</h4>
+          <div class="quiz-options-list">${optionsReviewHtml}</div>
+        `;
+        reviewContainer.appendChild(reviewCard);
       });
 
       const correctCount = currentQuizData.length - incorrectCount;
