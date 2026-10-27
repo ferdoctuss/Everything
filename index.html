@@ -8,8 +8,10 @@
   <link rel="icon" type="image/png" href="Logotipo P.png">
   <link rel="apple-touch-icon" href="Logotipo P.png">
 
-  <!-- Librería pdf-lib para manipulación local de PDFs -->
+  <!-- Librerías para lectura de PDF y DOCX locales -->
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
   <style>
     :root {
@@ -600,6 +602,55 @@
     .pinned-heading{display:flex;align-items:center;justify-content:space-between;margin:4px 0 14px;font-size:1rem}.pinned-heading small{color:var(--text-muted);font-weight:400}
     .pinned-section{margin-bottom:28px}.pin-action.active{color:var(--accent);background:rgba(99,102,241,.12)}
 
+    /* Estilos adicionales para el Cuestionario */
+    .quiz-question-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .quiz-question-card h4 {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .quiz-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quiz-option-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: var(--transition);
+    }
+    .quiz-option-label:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-card);
+    }
+    .quiz-option-label input {
+      accent-color: var(--accent);
+    }
+    .quiz-option-label.correct-answer {
+      background: rgba(16, 185, 129, 0.15) !important;
+      border-color: var(--success) !important;
+      color: var(--success);
+    }
+    .quiz-option-label.wrong-answer {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: var(--danger) !important;
+      color: var(--danger);
+    }
+
     @media(max-width:650px){
       .account-trigger span{display:none}
       .home-header{padding:0 10px;}
@@ -716,6 +767,18 @@
           </div>
         </div>
         <p>Transforma textos de IA en escritos fluidos, creíbles y humanos.</p>
+      </div>
+
+      <!-- NUEVA TARJETA: GENERADOR DE PREGUNTAS -->
+      <div class="home-card" onclick="switchView('quiz')">
+        <div class="app-card-header">
+          <div class="app-card-icon">❓</div>
+          <div class="app-card-title-group">
+            <h3>Generador Quiz</h3>
+            <span>Cuestionario AI</span>
+          </div>
+        </div>
+        <p>Genera preguntas y alternativas de estudio basadas en tus textos o archivos.</p>
       </div>
     </div>
   </section>
@@ -991,6 +1054,76 @@
         </div>
         <button class="btn-cancel" onclick="copyHumanizedText()" style="width: 100%;">📋 Copiar Resultado</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= VISTA 8: GENERADOR DE PREGUNTAS (QUIZ) ================= -->
+  <section class="view-section" id="view-quiz">
+    <button class="back-home-btn" onclick="switchView('home')">
+      ← Volver al Home
+    </button>
+
+    <div class="app-container" style="max-width: 800px;">
+      <h2>Generador de Preguntas (Quiz)</h2>
+      <p>Pega texto o sube un documento PDF o Word (.docx) para generar un cuestionario personalizado de estudio.</p>
+      
+      <!-- Paso 1: Configuración de entrada -->
+      <div id="quizSetupContainer">
+        <div class="comparator-inputs" style="grid-template-columns: 1fr; gap: 16px;">
+          <div class="comparator-group">
+            <label>Pega tu texto de estudio o resumen aquí:</label>
+            <textarea id="quizInputText" placeholder="Escribe o pega información clave..." style="height: 120px;"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px; text-align: left;">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">O sube un archivo (PDF / Word):</label>
+          <label class="dropzone" style="padding: 20px; margin-bottom: 0;">
+            <input type="file" id="quizFileInput" accept=".pdf,.docx,.txt" onchange="handleQuizFileUpload(event)">
+            <div class="dropzone-text" id="quizFileNameDisplay">
+              📁 <strong>Haz clic para seleccionar</strong> archivo PDF o Word
+            </div>
+          </label>
+        </div>
+
+        <div class="comparator-inputs" style="grid-template-columns: 1fr; gap: 16px; align-items: center;">
+          <div class="comparator-group" style="margin-bottom: 0;">
+            <label>Número de preguntas a generar:</label>
+            <select id="quizCountSelect" class="converter-select">
+              <option value="5">5 preguntas</option>
+              <option value="10" selected>10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-app-action" id="generateQuizBtn" onclick="generateQuiz()" style="margin-top: 20px;">
+          ⚡ Generar Cuestionario
+        </button>
+      </div>
+
+      <!-- Paso 2: Resolución del Cuestionario -->
+      <div id="quizPlayContainer" style="display: none; text-align: left;">
+        <div id="quizQuestionsList"></div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button class="btn-app-action" onclick="evaluateQuiz()" style="flex: 2;">Ver Resultados</button>
+          <button class="btn-cancel" onclick="resetQuizSetup()" style="flex: 1;">Volver / Nuevo</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: Resultados -->
+      <div id="quizResultContainer" style="display: none; text-align: left; margin-top: 20px;">
+        <div id="quizScoreCard" class="result-card" style="display: block; margin-bottom: 20px;"></div>
+        
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-app-action" onclick="retrySameQuiz()" style="flex: 1;">Intentar de Nuevo (Mismas)</button>
+          <button class="btn-primary" onclick="generateQuiz()" style="flex: 1; justify-content: center;">Refrescar Preguntas (Nuevas)</button>
+        </div>
+        <button class="btn-cancel" onclick="resetQuizSetup()" style="width: 100%; margin-top: 10px;">Elegir otro texto / archivo</button>
+      </div>
+
     </div>
   </section>
 
@@ -1433,7 +1566,6 @@
         throw new Error('No has configurado una API Key de Groq en el menú de Configuración.');
       }
 
-      // Modelo extraído de tu app de ejemplo (Paul)
       const models = ['openai/gpt-oss-120b'];
       let lastError = "Fallo desconocido.";
 
@@ -1451,13 +1583,11 @@
             })
           });
 
-          // Captura el error exacto de Groq si la petición es rechazada
           if (!response.ok) {
             const errData = await response.json();
             throw new Error(errData.error?.message || `Error HTTP ${response.status}`);
           }
 
-          // Si todo va bien, devuelve el texto
           const data = await response.json();
           return data.choices[0].message.content;
 
@@ -1465,14 +1595,12 @@
           console.warn(`Intento con ${model} falló:`, e.message);
           lastError = e.message;
           
-          // Si el error es de autenticación, detenemos la ejecución y avisamos
           if (lastError.toLowerCase().includes('api key') || lastError.toLowerCase().includes('unauthorized') || lastError.includes('401')) {
             throw new Error('Tu API Key de Groq es inválida o incorrecta. Por favor, reingrésala en la configuración.');
           }
         }
       }
       
-      // Si todos los modelos fallan, mostramos el último error registrado
       throw new Error(`Error de Groq: ${lastError}`);
     };
 
@@ -1525,6 +1653,180 @@ IMPORTANTE: Devuelve ÚNICAMENTE el texto corregido, sin saludos, sin confirmaci
       navigator.clipboard.writeText(output.value).then(() => {
         window.showToast("¡Texto copiado al portapapeles!");
       });
+    };
+
+    // ================= LÓGICA DEL GENERADOR DE PREGUNTAS (QUIZ) =================
+    let quizExtractedText = "";
+    let currentQuizData = [];
+
+    window.handleQuizFileUpload = async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('quizFileNameDisplay').innerHTML = `📄 <strong>Archivo cargado:</strong> ${file.name}`;
+      const reader = new FileReader();
+
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        reader.onload = async function() {
+          try {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+            }
+            quizExtractedText = fullText;
+            window.showToast("¡PDF leído con éxito!");
+          } catch(err) {
+            alert("No se pudo leer el PDF.");
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else if (file.name.endsWith('.docx')) {
+        reader.onload = async function() {
+          try {
+            const result = await mammoth.extractRawText({ arrayBuffer: this.result });
+            quizExtractedText = result.value;
+            window.showToast("¡Word leído con éxito!");
+          } catch(err) {
+            alert("No se pudo leer el archivo Word.");
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.onload = function() {
+          quizExtractedText = this.result;
+          window.showToast("¡Archivo de texto leído!");
+        };
+        reader.readAsText(file);
+      }
+    };
+
+    window.generateQuiz = async function() {
+      const manualText = document.getElementById('quizInputText').value.trim();
+      const sourceText = manualText || quizExtractedText;
+      const count = document.getElementById('quizCountSelect').value;
+
+      if (!sourceText) {
+        window.showToast("Por favor, ingresa texto o sube un documento primero.");
+        return;
+      }
+
+      const btn = document.getElementById('generateQuizBtn');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '⏳ Generando preguntas con IA...';
+      btn.disabled = true;
+
+      const systemPrompt = `Eres un profesor experto creando cuestionarios de evaluación. Basándote estrictamente en el texto provisto por el usuario, genera exactamente ${count} preguntas de opción múltiple.
+Debes responder ÚNICAMENTE en formato JSON válido (un arreglo de objetos), sin texto adicional antes ni después, sin bloques markdown como \`\`\`json.
+Estructura exacta por objeto:
+{
+  "pregunta": "Texto de la pregunta",
+  "alternativas": ["Opción A", "Opción B", "Opción C", "Opción D"],
+  "respuestaCorrecta": "La opción exacta que coincide con una de las alternativas"
+}`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: sourceText }
+      ];
+
+      try {
+        const responseJsonStr = await window.callGroqAI(messages);
+        // Limpiamos posibles bloques markdown si los hubiera
+        const cleanJson = responseJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+        currentQuizData = JSON.parse(cleanJson);
+
+        renderQuizQuestions();
+        document.getElementById('quizSetupContainer').style.display = 'none';
+        document.getElementById('quizResultContainer').style.display = 'none';
+        document.getElementById('quizPlayContainer').style.display = 'block';
+        window.showToast("¡Cuestionario generado!");
+      } catch (err) {
+        alert("Error al generar el cuestionario: " + err.message);
+      } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+      }
+    };
+
+    function renderQuizQuestions() {
+      const container = document.getElementById('quizQuestionsList');
+      container.innerHTML = '';
+
+      currentQuizData.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-question-card';
+        card.dataset.index = qIndex;
+
+        let optionsHtml = '';
+        // Mezclamos o mostramos las alternativas
+        q.alternativas.forEach((alt, aIndex) => {
+          optionsHtml += `
+            <label class="quiz-option-label" id="q${qIndex}_opt${aIndex}">
+              <input type="radio" name="question_${qIndex}" value="${alt.replace(/"/g, '&quot;')}">
+              <span>${alt}</span>
+            </label>
+          `;
+        });
+
+        card.innerHTML = `
+          <h4>${qIndex + 1}. ${q.pregunta}</h4>
+          <div class="quiz-options-list">${optionsHtml}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.evaluateQuiz = function() {
+      let incorrectCount = 0;
+      let totalAnswered = 0;
+
+      currentQuizData.forEach((q, qIndex) => {
+        const selectedRadio = document.querySelector(`input[name="question_${qIndex}"]:checked`);
+        const optionsList = document.querySelectorAll(`input[name="question_${qIndex}"]`);
+
+        optionsList.forEach(radio => {
+          const label = radio.closest('.quiz-option-label');
+          label.classList.remove('correct-answer', 'wrong-answer');
+          if (radio.value.trim() === q.respuestaCorrecta.trim()) {
+            label.classList.add('correct-answer');
+          }
+        });
+
+        if (selectedRadio) {
+          totalAnswered++;
+          if (selectedRadio.value.trim() !== q.respuestaCorrecta.trim()) {
+            incorrectCount++;
+            selectedRadio.closest('.quiz-option-label').classList.add('wrong-answer');
+          }
+        } else {
+          incorrectCount++; // Si no marcó nada cuenta como fallo
+        }
+      });
+
+      const correctCount = currentQuizData.length - incorrectCount;
+      const scoreCard = document.getElementById('quizScoreCard');
+      scoreCard.className = 'result-card ' + (incorrectCount === 0 ? 'match' : 'nomatch');
+      scoreCard.innerHTML = `Resultados: Tienes ${correctCount} correctas y ${incorrectCount} fallidas (Total: ${currentQuizData.length})`;
+
+      document.getElementById('quizPlayContainer').style.display = 'none';
+      document.getElementById('quizResultContainer').style.display = 'block';
+      document.getElementById('quizResultContainer').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.retrySameQuiz = function() {
+      renderQuizQuestions();
+      document.getElementById('quizResultContainer').style.display = 'none';
+      document.getElementById('quizPlayContainer').style.display = 'block';
+    };
+
+    window.resetQuizSetup = function() {
+      document.getElementById('quizPlayContainer').style.display = 'none';
+      document.getElementById('quizResultContainer').style.display = 'none';
+      document.getElementById('quizSetupContainer').style.display = 'block';
     };
 
     // ================= UTILIDADES Y NAVEGACIÓN =================
